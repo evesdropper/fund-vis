@@ -74,3 +74,4 @@ def visualize():
     plt.show(block=False)
     plt.pause(15)
     plt.close()
+    return fig
