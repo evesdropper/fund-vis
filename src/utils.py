@@ -14,6 +14,5 @@ def load_entry(file):
 def join(path, file):
     return os.path.join(path, file)
 
-def clean_dirs(dir):
-    for file in os.listdir(dir):
-        os.remove(join(dir, file))
+def clean(file):
+    open(file, 'w').close()

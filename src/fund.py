@@ -7,6 +7,9 @@ def cmd_input(args):
     match command:
         case "--help":
             print("Help text TBD")
+        case "cron":
+            scraper.get_entry()
+            scraper.visualize()
         case "reset":
             scraper.reset()
         case _:
