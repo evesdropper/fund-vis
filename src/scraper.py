@@ -72,3 +72,5 @@ def visualize():
     ax.set_ylim(0, 1.2 * max(y))
     plt.ylabel("Fund (in millions)")
     plt.show()
+    plt.pause(15)
+    plt.close()
