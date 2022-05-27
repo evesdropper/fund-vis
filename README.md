@@ -1,3 +1,3 @@
-# tankifund_visualizer
+# Tanki Fund Visualizer
 
-Visualizing Tanki Fund
+Yay! Viualizing the Tanki Fund.
