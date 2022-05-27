@@ -1,5 +1,6 @@
  # necessary imports - scraping
-import os, utils
+import os
+import src.utils as utils
 import requests
 from bs4 import BeautifulSoup
 

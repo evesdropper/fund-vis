@@ -1,5 +1,5 @@
 import src.scraper as scraper
-import src.fund as fund
+
 import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from flask import Flask, render_template, Response
