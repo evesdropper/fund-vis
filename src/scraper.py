@@ -1,6 +1,6 @@
  # necessary imports - scraping
 import os
-import src.utils as utils
+import utils as utils
 import requests
 from bs4 import BeautifulSoup
 
@@ -49,7 +49,7 @@ def get_entry():
     funds_arr = utils.load_entry(SAVEFILE)
     funds_arr = np.append(funds_arr, FundEntry(fund[0].text))
     utils.save_entry(funds_arr, SAVEFILE)
-    return fund[0].text, funds_arr
+    return fund[0].text
 
 # xlims
 def get_xlim():
@@ -67,12 +67,9 @@ def visualize():
     ax.scatter(mdates.datestr2num(x), y)
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-    ax.set_xlim(pd.Timestamp('2022-05-27'), get_xlim())
+    ax.set_xlim(pd.Timestamp('2022-05-27 12:00:00'), get_xlim())
     plt.xticks(rotation=60)
     plt.xlabel("Time")
     ax.set_ylim(0, 1.2 * max(y))
     plt.ylabel("Fund (in millions)")
-    plt.show(block=False)
-    plt.pause(15)
-    plt.close()
     return fig

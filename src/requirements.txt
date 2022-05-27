@@ -1,3 +1,4 @@
 Flask==2.1.2
 gunicorn==20.0.4
-
+scraper==0.1.0
+utils=0.1.0

@@ -1,5 +1,5 @@
-import src.scraper as scraper
-
+import scraper as scraper
+from scraper import FundEntry
 import io
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from flask import Flask, render_template, Response
@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", current_fund = scraper.get_entry())
 
 @app.route('/plot.png')
 def plot_png():

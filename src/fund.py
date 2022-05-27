@@ -1,7 +1,7 @@
 # CLI
 import sys
-import src.scraper as scraper
-from src.scraper import FundEntry
+import scraper as scraper
+from scraper import FundEntry
 
 def cmd_input(args):
     command = args[0]
