@@ -56,6 +56,7 @@ def get_xlim():
     end_x = (today + datetime.timedelta(days=1))
     return pd.Timestamp(end_x)
 
+# scuffed :sob:
 def visualize():
     funds_arr = utils.load_entry(SAVEFILE)
     x, y = [fund.time for fund in funds_arr], [(int(fund.value) / 1000000) for fund in funds_arr]
@@ -71,5 +72,3 @@ def visualize():
     ax.set_ylim(0, 1.2 * max(y))
     plt.ylabel("Fund (in millions)")
     plt.show()
-
-visualize()

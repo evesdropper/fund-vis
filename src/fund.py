@@ -1,12 +1,13 @@
 # CLI
 import sys
-import scraper, utils
+import scraper
+from scraper import FundEntry
 
 def cmd_input(args):
     command = args[0]
     match command:
         case "--help":
-            print("Help text TBD")
+            print("You're not a cron job; don't ask for help.")
         case "cron":
             scraper.get_entry()
             scraper.visualize()
