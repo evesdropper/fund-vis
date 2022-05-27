@@ -28,10 +28,15 @@ class FundEntry():
     def __str__(self):
         return f"Fund at {self.time}: {self.value}"
 
-
+# start a new fund array
 def initialize_arr():
     funds_arr = np.array([])
     utils.save_entry(funds_arr, SAVEFILE)
+
+# reset fund data
+def reset():
+    utils.clean_dirs(SAVE_DIR)
+    initialize_arr()
 
 def get_entry():
     page = requests.get(URL)
@@ -41,3 +46,5 @@ def get_entry():
     funds_arr = np.append(funds_arr, FundEntry(fund[0].text))
     utils.save_entry(funds_arr, SAVEFILE)
     return fund[0].text, funds_arr
+
+
