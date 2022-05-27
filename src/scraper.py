@@ -1,53 +1,75 @@
-# necessary imports
-import time, datetime
-import asyncio
-import pickle
+ # necessary imports - scraping
+import os, utils
+import requests
+from bs4 import BeautifulSoup
+
+# data analysis
+import datetime
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
-# selenium imports
-from selenium import webdriver   # for webdriver
-from selenium.webdriver.support.ui import WebDriverWait  # for implicit and explict waits
-from selenium.webdriver.chrome.options import Options  # for suppressing the browser
-from selenium.webdriver.common.by import By
+# big capital letters
+CWD = os.getcwd()
+SAVE_DIR = os.path.join(CWD, "saved")
+SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
 
-option = webdriver.ChromeOptions()
-option.add_argument('headless')
-driver = webdriver.Chrome('C:/Program Files (x86)/chromedriver.exe',options=option)
+URL = "https://tankionline.com/pages/tanki-birthday-2022/" # when new fund website
 
-"""
-Setup: Main Variables
-"""
-TIMES = np.array([1, 2, 3])
-FUNDS = np.array([4, 5, 6]) # array of funds
-DATASET = pd.DataFrame({'Time': [TIMES], 'Fund': [FUNDS]})
-INTERVAL = 9000 # interval between each check in seconds
-URL = "https://tankionline.com/pages/tanki-sport-season4/?lang=en" # change to current fund
-CLASS_NAME = "prize-fond" # class name, bruh use id smh
-np.save("times.npy", TIMES)
-np.save("funds.npy", FUNDS)
-TIMES_DATA = "times.npy"
-FUNDS_DATA = "funds.npy"
+# fund entries
+class FundEntry():
+    
+    def __init__(self, value):
+        self.time = datetime.datetime.utcnow().strftime('%m-%d %H:%M')
+        self.value = value    
+    
+    def __repr__(self):
+        return f"{self.time}: {self.value}"
+    
+    def __str__(self):
+        return f"Fund at {self.time}: {self.value}"
 
-"""
-Get Data
-"""
+# start a new fund array
+def initialize_arr():
+    funds_arr = np.array([])
+    utils.save_entry(funds_arr, SAVEFILE)
 
-def get_data():
-    time_data, fund_data = np.load(TIMES_DATA), np.load(FUNDS_DATA)
-    driver.get(URL)
-    data = driver.find_element(By.CLASS_NAME, CLASS_NAME)
-    fund_data = np.append(FUNDS, int(data.text.replace(" ", "")) / 1000)
-    update_time_raw = datetime.datetime.utcnow()
-    update_time = update_time_raw.strftime("%Y-%m-%d %H:%M:%S")
-    time_data = np.append(TIMES, update_time)
-    np.save(TIMES_DATA, time_data)
-    np.save(FUNDS_DATA, fund_data)
-    print("Done")
+# reset fund data
+def reset():
+    utils.clean(SAVEFILE)
+    initialize_arr()
 
-def display_df():
-    df = pd.DataFrame({'Time': np.load(TIMES_DATA), 'Fund': np.load(FUNDS_DATA)})
-    print(df)
+# fund 
+def get_entry():
+    page = requests.get(URL)
+    soup = BeautifulSoup(page.content, "html.parser")
+    fund = soup.find_all("span", class_="ms-3")
+    funds_arr = utils.load_entry(SAVEFILE)
+    funds_arr = np.append(funds_arr, FundEntry(fund[0].text))
+    utils.save_entry(funds_arr, SAVEFILE)
+    return fund[0].text, funds_arr
 
-def main():
-    pass
+# xlims
+def get_xlim():
+    today = datetime.date.today()
+    end_x = (today + datetime.timedelta(days=1))
+    return pd.Timestamp(end_x)
+
+def visualize():
+    funds_arr = utils.load_entry(SAVEFILE)
+    x, y = [fund.time for fund in funds_arr], [(int(fund.value) / 1000000) for fund in funds_arr]
+    fig = plt.figure(figsize=(8, 6), dpi=100)
+    ax = fig.add_subplot(111)
+    plt.subplots_adjust(bottom=0.25)
+    ax.scatter(mdates.datestr2num(x), y)
+    plt.title("Tanki Fund over Time", fontsize=20)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
+    ax.set_xlim(pd.Timestamp('2022-05-27'), get_xlim())
+    plt.xticks(rotation=60)
+    plt.xlabel("Time")
+    ax.set_ylim(0, 1.2 * max(y))
+    plt.ylabel("Fund (in millions)")
+    plt.show()
+
+visualize()
