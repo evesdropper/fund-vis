@@ -83,6 +83,6 @@ def visualize():
 def fund_delta():
     funds_arr = utils.load_entry(SAVEFILE)
     if len(funds_arr) > 1:
-        return funds_arr[-1].value - funds_arr[-2].value
+        return int(funds_arr[-1].value) - int(funds_arr[-2].value)
     else:
         return 0
