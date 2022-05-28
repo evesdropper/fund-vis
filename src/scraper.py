@@ -141,9 +141,9 @@ def visualize():
     # checkpoint lines
     for i in range(len(CHECKPOINTS)):
         if CHECKPOINTS[i] < max(y):
-            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', alpha=0.35, label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', alpha=0.35, label=f"Achieved: {REWARDS[i]}")
         elif CHECKPOINTS[i] < y_upper:
-            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.35, label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.35, label=f"Upcoming: {REWARDS[i]}")
     plt.ylabel("Fund (in millions)")
     m, b = regression(x_time, y)
     xrange = np.linspace(mdates.datestr2num('2022-05-27 12:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')))
