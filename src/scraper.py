@@ -98,25 +98,23 @@ def regression(x, y):
     b = np.mean(y) - m * np.mean(x)    
     return m, b
 
-def next_checkpoint(reward=False):
+def next_checkpoint():
     x, y = get_data()
     x_time = mdates.datestr2num(x)
     m, b = regression(x_time, y)
     c_next = [c for c in CHECKPOINTS if c > max(y)][0]
     idx = CHECKPOINTS.index(c_next)
-    if reward:
-        return REWARDS[idx]
     x_next = mdates.num2date((c_next - b) / m)
     x_next = x_next.replace(tzinfo=datetime.timezone.utc)
     t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
-    return f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
+    return REWARDS[idx], f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
 
 def end_fund():
     x, y = get_data()
     x_time = mdates.datestr2num(x)
     m, b = regression(x_time, y)
     y_final = m * mdates.date2num(END_DATE) + b
-    return y_final, "Yes" if y_final > max(y) else "No"
+    return f"{np.round(y_final)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
 
 def tdelta_format(td):
     seconds = np.round(td.total_seconds())
