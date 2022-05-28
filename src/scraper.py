@@ -80,6 +80,12 @@ def get_xlim():
     end_x = (today + datetime.timedelta(days=1))
     return pd.Timestamp(end_x)
 
+def regression(x, y):
+    r = np.corrcoef(x, y)[0, 1]
+    m = r * (np.std(y) / np.std(x))
+    b = np.mean(y) - m * np.mean(x)
+    return m, b
+
 # scuffed :sob:
 def visualize():
     funds_arr = utils.load_entry(SAVEFILE)
@@ -87,7 +93,7 @@ def visualize():
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
-    plt.plot(mdates.datestr2num(x), y, marker=".", linestyle='-')
+    plt.plot(mdates.datestr2num(x), y, marker=".", linestyle='-', markersize=10)
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
     ax.set_xlim(pd.Timestamp('2022-05-27 12:00:00'), get_xlim())
@@ -98,10 +104,12 @@ def visualize():
     # checkpoint lines
     for i in range(len(CHECKPOINTS)):
         if CHECKPOINTS[i] < max(y):
-            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', alpha=0.65, label=REWARDS[i])
         elif CHECKPOINTS[i] < y_upper:
-            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.5, label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
+    m, b = regression(x, y)
+    plt.plot(x, m * x + b, color='black', linestyle="--", label="LinReg Prediction")
     plt.legend(loc=2)
     return fig
 
