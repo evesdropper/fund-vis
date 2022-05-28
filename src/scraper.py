@@ -114,7 +114,7 @@ def end_fund():
     x_time = mdates.datestr2num(x)
     m, b = regression(x_time, y)
     y_final = m * mdates.date2num(END_DATE) + b
-    return f"{np.round(y_final)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
+    return f"{np.round(y_final, 3)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
 
 def tdelta_format(td):
     seconds = np.round(td.total_seconds())
