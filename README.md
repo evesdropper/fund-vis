@@ -22,4 +22,4 @@ Append `python(3) fund.py` to all functions.
 - `last`: get the time of the last entry.
 - Anything else not mentioned will run into a surprise.
 
-Find the application deployed on Heroku ![here](https://fund-vis.herokuapp.com/).
+Find the application deployed on Heroku [here](https://fund-vis.herokuapp.com/).
