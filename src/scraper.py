@@ -50,7 +50,7 @@ def get_entry():
     soup = BeautifulSoup(page.content, "html.parser")
     fund = soup.find_all("span", class_="ms-3")
     funds_arr = utils.load_entry(SAVEFILE)
-    funds_arr = np.append(funds_arr, FundEntry(entry))
+    funds_arr = np.append(funds_arr, FundEntry(fund[0].text))
     utils.save_entry(funds_arr, SAVEFILE)
     return fund[0].text
 
