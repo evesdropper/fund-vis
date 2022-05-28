@@ -5,5 +5,5 @@ pandas==1.4.2
 numpy==1.22.4
 requests==2.27.1
 bs4==0.0.1
-beautifulsoup==4.9.1
+beautifulsoup==3.2.2
 datetime==4.4
