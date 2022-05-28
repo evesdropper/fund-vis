@@ -9,7 +9,7 @@ def cmd_input(args):
     if command == "cron":
         scraper.get_entry()
     elif command == "check":
-        print(scraper.entries())
+        print(scraper.entries()[-10:])
     elif command == "render":
         scraper.render()
     else:
