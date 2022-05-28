@@ -21,6 +21,9 @@ URL = "https://tankionline.com/pages/tanki-birthday-2022/" # when new fund websi
 CHECKPOINTS = [3] + list(range(6, 16))
 REWARDS = ["Prot Slot", "Prot Slot", "Skin Cont", "Skin Cont", "Prot Slot", "Hyperion", "Blaster", "Armadillo", "Pulsar", "Crisis", "Surprise"]
 
+"""
+Base Setup
+"""
 # fund entries
 class FundEntry():
     
@@ -44,6 +47,9 @@ def reset():
     utils.clean(SAVEFILE)
     initialize_arr()
 
+"""
+Major Workflow
+"""
 def scrape(checkstatus=False):
     try: 
         page = requests.get(URL, timeout=(5, 15))
@@ -90,14 +96,16 @@ def visualize():
     # checkpoint lines
     for i in range(len(CHECKPOINTS)):
         if CHECKPOINTS[i] < max(y):
-            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='green', a=0.65, linestyle='--', label=REWARDS[i])
         elif CHECKPOINTS[i] < y_upper:
-            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='red', a=0.5, linestyle='--', label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
     plt.legend(loc=2)
     return fig
 
-# utility batch functions for *testing purposes*
+"""
+Utility Functions
+"""
 def entries():
     funds_arr = utils.load_entry(SAVEFILE)
     return funds_arr
