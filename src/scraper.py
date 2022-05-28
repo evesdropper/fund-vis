@@ -79,3 +79,10 @@ def visualize():
         plt.axhline(CHECKPOINTS[i], color='r', linestyle='--', label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
     return fig
+
+def fund_delta():
+    funds_arr = utils.load_entry(SAVEFILE)
+    if len(funds_arr) > 1:
+        return funds_arr[-1].value - funds_arr[-2].value
+    else:
+        return 0
