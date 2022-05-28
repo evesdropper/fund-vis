@@ -1,4 +1,5 @@
 #!/bin/sh
+cd /mnt/c/Users/Evelyn/Documents/tonk/fund-vis
 cd src
 python3 fund.py cron
 cd ..
