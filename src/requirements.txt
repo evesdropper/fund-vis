@@ -5,5 +5,5 @@ pandas==1.4.2
 numpy==1.22.4
 requests==2.27.1
 bs4==0.0.1
-beautifulsoup @ https://files.pythonhosted.org/packages/9c/d8/909c4089dbe4ade9f9705f143c9f13f065049a9d5e7d34c828aefdd0a97c/beautifulsoup4-4.11.1-py3-none-any.whl
+beautifulsoup4 @ https://files.pythonhosted.org/packages/9c/d8/909c4089dbe4ade9f9705f143c9f13f065049a9d5e7d34c828aefdd0a97c/beautifulsoup4-4.11.1-py3-none-any.whl
 datetime==4.4
