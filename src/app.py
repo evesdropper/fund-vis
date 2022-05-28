@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("index.html", current_fund = scraper.get_entry(), change=scraper.fund_delta(), last_upd=datetime.datetime.now().strftime("%m-%d %H:%M"))
+    return render_template("index.html", current_fund = scraper.get_entry(), change=scraper.fund_delta(), last_upd=last_upd())
 
 @app.route('/plot.png')
 def plot_png():
@@ -19,6 +19,10 @@ def plot_png():
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')
+
+@app.route("/last-upd")
+def last_upd():
+    return scraper.entry_loop()
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8080, debug=True)
