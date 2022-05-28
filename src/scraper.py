@@ -77,10 +77,14 @@ def visualize():
     ax.set_xlim(pd.Timestamp('2022-05-27 12:00:00'), get_xlim())
     plt.xticks(rotation=60)
     plt.xlabel("Time")
-    ax.set_ylim(0, 1.2 * max(y))
+    y_upper = 1.2 * max(y)
+    ax.set_ylim(0, y_upper)
     # checkpoint lines
     for i in range(len(CHECKPOINTS)):
-        plt.axhline(CHECKPOINTS[i], color='r', linestyle='--', label=REWARDS[i])
+        if CHECKPOINTS[i] < max(y):
+            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', label=REWARDS[i])
+        elif CHECKPOINTS[i] < y_upper:
+            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
     plt.legend(loc=2)
     return fig
