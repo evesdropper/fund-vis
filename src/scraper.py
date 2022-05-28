@@ -46,14 +46,14 @@ def reset():
 
 def scrape(checkstatus=False):
     try: 
-        page = requests.get(URL)
+        page = requests.get(URL, timeout=(5, 15))
         soup = BeautifulSoup(page.content, "html.parser")
         fund = soup.find_all("span", class_="ms-3")
         fund_text = fund[0].text
-        status = "Site is down; using backups."
+        status = "Up to date"
     except:
         fund_text = last_entry()
-        status = "Up to date"
+        status = "Site is down; using backups."
     if checkstatus:
         return status
     return fund_text
