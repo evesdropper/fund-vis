@@ -13,10 +13,10 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # big capital letters
-# CWD = os.getcwd()
-DOCS = os.environ["DOCS"]
-PROJ_DIR = os.path.join(DOCS, "tonk/fund-vis/src")
-SAVE_DIR = os.path.join(PROJ_DIR, "saved")
+CWD = os.getcwd()
+# DOCS = os.environ["DOCS"]
+# PROJ_DIR = os.path.join(DOCS, "tonk/fund-vis/src")
+SAVE_DIR = os.path.join(CWD, "saved")
 SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
 
 URL = "https://tankionline.com/pages/tanki-birthday-2022/" # when new fund website
@@ -58,12 +58,12 @@ def scrape(checkstatus=False):
         soup = BeautifulSoup(page.content, "html.parser")
         fund = soup.find_all("span", class_="ms-3")
         fund_text = fund[0].text
-        status = "Up to date"
+        if checkstatus:
+            return "Up to date"
     except:
+        if checkstatus:
+            return "Site is down; using backups."
         fund_text = last_entry()
-        status = "Site is down; using backups."
-    if checkstatus:
-        return status
     return fund_text
 
 # fund 
@@ -87,6 +87,7 @@ def visualize():
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
+    plt.plot(mdates.datestr2num(x, y), marker=".", linestyle='-', color='b')
     ax.scatter(mdates.datestr2num(x), y)
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
@@ -129,5 +130,3 @@ def fund_delta():
         return int(funds_arr[-1].value) - int(funds_arr[-2].value)
     else:
         return 0
-
-print(PROJ_DIR)
