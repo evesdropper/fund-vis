@@ -1,6 +1,7 @@
 #!/bin/sh
-python3 src/fund.py cron
-
+cd src
+python3 fund.py cron
+cd ..
 message=$(date '+%Y-%m-%d %H:%M:%S')
 git add .
 git commit -m "add entry at ${message}"
