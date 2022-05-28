@@ -1,5 +1,6 @@
- # necessary imports - scraping
-import os
+ # necessary imports - scraping and heroku being retarded
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import utils as utils
 import requests
 from bs4 import BeautifulSoup
@@ -53,7 +54,7 @@ def get_entry():
 
 # xlims
 def get_xlim():
-    today = datetime.date.today()
+    today = datetime.datetime.utcnow().date()
     end_x = (today + datetime.timedelta(days=1))
     return pd.Timestamp(end_x)
 
