@@ -10,6 +10,8 @@ def cmd_input(args):
         scraper.get_entry()
     elif command == "check":
         print(scraper.entries()[-10:])
+    elif command == "last":
+        print(scraper.entries()[-1].time)
     elif command == "render":
         scraper.render()
     else:

@@ -44,19 +44,14 @@ def reset():
     utils.clean(SAVEFILE)
     initialize_arr()
 
-# load/save
-def entry_loop(entry):
-    funds_arr = utils.load_entry(SAVEFILE)
-    funds_arr = np.append(funds_arr, FundEntry(entry))
-    utils.save_entry(funds_arr, SAVEFILE)
-    return datetime.datetime.now().strftime("%m-%d %H:%M")
-
 # fund 
 def get_entry():
     page = requests.get(URL)
     soup = BeautifulSoup(page.content, "html.parser")
     fund = soup.find_all("span", class_="ms-3")
-    entry_loop(fund[0].text)
+    funds_arr = utils.load_entry(SAVEFILE)
+    funds_arr = np.append(funds_arr, FundEntry(entry))
+    utils.save_entry(funds_arr, SAVEFILE)
     return fund[0].text
 
 # xlims
@@ -94,6 +89,9 @@ def visualize():
 def entries():
     funds_arr = utils.load_entry(SAVEFILE)
     return funds_arr
+
+def last_entry_time():
+    return entries()[-1].time
 
 def render():
     get_entry()
