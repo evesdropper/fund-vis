@@ -15,7 +15,7 @@ def index():
 
 @app.route('/plot.png')
 def plot_png():
-    fig = scraper.visualize()
+    fig = scraper.render()
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
     return Response(output.getvalue(), mimetype='image/png')

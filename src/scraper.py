@@ -89,6 +89,11 @@ def visualize():
     plt.legend(loc=2)
     return fig
 
+def render():
+    get_entry()
+    out = visualize()
+    return out
+
 def fund_delta():
     funds_arr = utils.load_entry(SAVEFILE)
     if len(funds_arr) > 1:
