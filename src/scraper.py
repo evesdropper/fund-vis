@@ -74,6 +74,16 @@ def get_entry():
     utils.save_entry(funds_arr, SAVEFILE)
     return fund_text
 
+
+"""
+Visualization
+"""
+# get data
+def get_data():
+    funds_arr = utils.load_entry(SAVEFILE)
+    x, y = [fund.time for fund in funds_arr], [(int(fund.value) / 1000000) for fund in funds_arr]
+    return x, y
+
 # xlims
 def get_xlim():
     today = datetime.datetime.utcnow().date()
@@ -81,15 +91,14 @@ def get_xlim():
     return pd.Timestamp(end_x)
 
 def regression(x, y):
-    r = np.corrcoef(x, y)  
+    r = np.corrcoef(x, y)[0, 1]
     m = r * (np.std(y) / np.std(x))
-    b = np.mean(y) - m * np.mean(x)
+    b = np.mean(y) - m * np.mean(x)    
     return m, b
 
 # scuffed :sob:
 def visualize():
-    funds_arr = utils.load_entry(SAVEFILE)
-    x, y = [fund.time for fund in funds_arr], [(int(fund.value) / 1000000) for fund in funds_arr]
+    x, y = get_data()
     x_time = mdates.datestr2num(x)
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
@@ -105,14 +114,17 @@ def visualize():
     # checkpoint lines
     for i in range(len(CHECKPOINTS)):
         if CHECKPOINTS[i] < max(y):
-            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', alpha=0.65, label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', alpha=0.35, label=REWARDS[i])
         elif CHECKPOINTS[i] < y_upper:
-            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.5, label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.35, label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
     m, b = regression(x_time, y)
-    xrange = np.linspace(mdates.datestr2num('2022-05-27 12:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')), 2)
-    plt.plot(xrange, m*xrange+b, color='black', linestyle="--", label="LinReg Prediction")
-    plt.legend(loc=2)
+    xrange = np.linspace(mdates.datestr2num('2022-05-27 12:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')))
+    plt.plot(xrange, m*xrange+b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction\ny={np.round(m, 3)}x+{np.round(b, 3)}")
+    plt.legend(loc='upper left')
+    plt.savefig(os.path.join(CWD, "visualization.png"))
+    plt.show()
+    plt.legend(loc=2, fontsize=12)
     return fig
 
 """
