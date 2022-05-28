@@ -81,7 +81,7 @@ def get_xlim():
     return pd.Timestamp(end_x)
 
 def regression(x, y):
-    r = np.corrcoef(x, y)[0, 1]
+    r = np.corrcoef(x, y)  
     m = r * (np.std(y) / np.std(x))
     b = np.mean(y) - m * np.mean(x)
     return m, b
@@ -90,10 +90,11 @@ def regression(x, y):
 def visualize():
     funds_arr = utils.load_entry(SAVEFILE)
     x, y = [fund.time for fund in funds_arr], [(int(fund.value) / 1000000) for fund in funds_arr]
+    x_time = mdates.datestr2num(x)
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
-    plt.plot(mdates.datestr2num(x), y, marker=".", linestyle='-', markersize=10)
+    plt.plot(x_time, y, marker=".", linestyle='-', markersize=10)
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
     ax.set_xlim(pd.Timestamp('2022-05-27 12:00:00'), get_xlim())
@@ -108,8 +109,9 @@ def visualize():
         elif CHECKPOINTS[i] < y_upper:
             plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.5, label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
-    m, b = regression(x, y)
-    plt.plot(x, m * x + b, color='black', linestyle="--", label="LinReg Prediction")
+    m, b = regression(x_time, y)
+    xrange = np.linspace(mdates.datestr2num('2022-05-27 12:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')), 2)
+    plt.plot(xrange, m*xrange+b, color='black', linestyle="--", label="LinReg Prediction")
     plt.legend(loc=2)
     return fig
 
