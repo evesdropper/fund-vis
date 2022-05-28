@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # big capital letters
+DOCS = os.environ["DOCS"]
 CWD = os.getcwd()
 SAVE_DIR = os.path.join(CWD, "saved")
 SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
