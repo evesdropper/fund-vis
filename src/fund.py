@@ -11,7 +11,6 @@ def cmd_input(args):
             print("You're not a cron job; don't ask for help.")
         case "cron":
             scraper.get_entry()
-            scraper.visualize()
         case "reset":
             scraper.reset()
         case _:
