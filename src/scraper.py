@@ -84,7 +84,7 @@ def visualize():
         if CHECKPOINTS[i] < max(y):
             plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', label=REWARDS[i])
         elif CHECKPOINTS[i] < y_upper:
-            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
     plt.legend(loc=2)
     return fig
