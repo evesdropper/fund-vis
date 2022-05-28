@@ -13,9 +13,10 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 # big capital letters
+# CWD = os.getcwd()
 DOCS = os.environ["DOCS"]
-CWD = os.getcwd()
-SAVE_DIR = os.path.join(CWD, "saved")
+PROJ_DIR = os.path.join(DOCS, "tonk/fund-vis/src")
+SAVE_DIR = os.path.join(PROJ_DIR, "saved")
 SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
 
 URL = "https://tankionline.com/pages/tanki-birthday-2022/" # when new fund website
@@ -128,3 +129,5 @@ def fund_delta():
         return int(funds_arr[-1].value) - int(funds_arr[-2].value)
     else:
         return 0
+
+print(PROJ_DIR)
