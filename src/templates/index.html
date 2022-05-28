@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="description" content="Web app to scrape and track the progress of the Tanki Fund!">
     <title>Tanki Fund Tracker</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1 style="text-align: center;">Tanki Fund Tracker</h1>
     <h2 style="text-align: center;">2022 - Tanki's 13th Birthday</h2>
-    <div id="stats">
-    <img style="display: block; margin-left: auto; margin-right:auto;" src="/plot.png" alt="fund">
+    <div id="stats" style="display: flex; flex-flow: row wrap; justify-content: center; align-items: flex-start;">
+    <div>
+        <img style="display: block; margin-left: auto; margin-right:auto;" src="/plot.png" alt="fund">
+    </div>
+    <div>
     <table style="margin-left: auto; margin-right: auto;">
         <tr>
             <th>Current Funds</th>
@@ -19,8 +23,11 @@
             <td>{{current_fund}}</td>
             <td>{{change}}</td>
         </tr>
-    </table>
+    </table></div>
     </div>
+    <br>
 </body>
-<footer style="text-align: center;">Made by Person_Random.<br><br>Last updated {{last_upd}}</footer>
+<footer style="text-align: center; background-color: grey; margin-top:0.5em">
+    Made by Person_Random.<br><br>Last updated {{last_upd}}
+</footer>
 </html>
