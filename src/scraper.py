@@ -87,8 +87,7 @@ def visualize():
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
-    plt.plot(mdates.datestr2num(x), y, marker=".", linestyle='-', color='b')
-    ax.scatter(mdates.datestr2num(x), y)
+    plt.plot(mdates.datestr2num(x), y, marker=".", linestyle='-')
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
     ax.set_xlim(pd.Timestamp('2022-05-27 12:00:00'), get_xlim())
@@ -120,8 +119,8 @@ def last_entry_time():
     return entries()[-1].time
 
 def showplot():
-    plot = visualize()
-    plot.show()
+    visualize()
+    plt.show()
 
 def render():
     get_entry()
