@@ -12,8 +12,9 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return render_template("index.html", current_fund = scraper.get_entry(),
-    change=scraper.fund_delta(), last_upd=scraper.last_entry_time(),
-    status=scraper.scrape(checkstatus=True))
+    change=scraper.fund_delta(),
+    next_check = scraper.next_checkpoint(reward=True), tnext_check=scraper.next_checkpoint(),
+    last_upd=scraper.last_entry_time(),status=scraper.scrape(checkstatus=True))
 
 @app.route('/plot.png')
 def plot_png():

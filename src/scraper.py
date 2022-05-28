@@ -101,9 +101,9 @@ def next_checkpoint(reward=False):
     x_time = mdates.datestr2num(x)
     m, b = regression(x_time, y)
     c_next = [c for c in CHECKPOINTS if c > max(y)][0]
-    
+    idx = CHECKPOINTS.index(c_next)
     if reward:
-        return REWARDS[0]
+        return REWARDS[idx]
     x_next = mdates.num2date((c_next - b) / m)
     x_next = x_next.replace(tzinfo=datetime.timezone.utc)
     t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
@@ -141,10 +141,7 @@ def visualize():
     m, b = regression(x_time, y)
     xrange = np.linspace(mdates.datestr2num('2022-05-27 12:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')))
     plt.plot(xrange, m*xrange+b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction\ny={np.round(m, 3)}x+{np.round(b, 3)}")
-    plt.legend(loc='upper left')
-    plt.savefig(os.path.join(CWD, "visualization.png"))
-    plt.show()
-    plt.legend(loc=2, fontsize=12)
+    plt.legend(loc=2, fontsize=8)
     return fig
 
 """
