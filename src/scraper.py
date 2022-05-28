@@ -82,6 +82,7 @@ def visualize():
     for i in range(len(CHECKPOINTS)):
         plt.axhline(CHECKPOINTS[i], color='r', linestyle='--', label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
+    plt.legend(loc=2)
     return fig
 
 def fund_delta():
