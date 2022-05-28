@@ -14,6 +14,8 @@ def cmd_input(args):
         print(scraper.entries()[-1].time)
     elif command == "plot":
         scraper.showplot()
+    elif command == "nextpt":
+        scraper.next_checkpoint()
     else:
         print("Imposter Alert")
     # match command:

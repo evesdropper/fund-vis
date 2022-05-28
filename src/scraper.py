@@ -96,6 +96,16 @@ def regression(x, y):
     b = np.mean(y) - m * np.mean(x)    
     return m, b
 
+def next_checkpoint():
+    x, y = get_data()
+    x_time = mdates.datestr2num(x)
+    m, b = regression(x_time, y)
+    c_next = [c for c in CHECKPOINTS if c > max(y)][0]
+    x_next = mdates.num2date((c_next - b) / m)
+    x_next = x_next.replace(tzinfo=datetime.timezone.utc)
+    x_next_str = x_next.strftime('%m-%d %H:%M')
+    print(x_next.replace(tzinfo=datetime.timezone.utc) - datetime.datetime.utcnow())
+
 # scuffed :sob:
 def visualize():
     x, y = get_data()
