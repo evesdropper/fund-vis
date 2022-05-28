@@ -44,15 +44,23 @@ def reset():
     utils.clean(SAVEFILE)
     initialize_arr()
 
-# fund 
-def get_entry():
+def scrape(checkstatus=False):
     try: 
         page = requests.get(URL)
         soup = BeautifulSoup(page.content, "html.parser")
         fund = soup.find_all("span", class_="ms-3")
         fund_text = fund[0].text
+        status = "Site is down; using backups."
     except:
         fund_text = last_entry()
+        status = "Up to date"
+    if checkstatus:
+        return status
+    return fund_text
+
+# fund 
+def get_entry():
+    fund_text = scrape()
     funds_arr = utils.load_entry(SAVEFILE)
     funds_arr = np.append(funds_arr, FundEntry(fund_text))
     utils.save_entry(funds_arr, SAVEFILE)
