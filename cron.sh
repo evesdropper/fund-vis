@@ -7,5 +7,5 @@ git add .
 git commit -m "add entry at ${message}"
 git subtree push --prefix src heroku main
 
-echo "cron commit at ${message}" >> cronlog.txt
+echo "cron commit at ${message}" >> /mnt/c/Users/Evelyn/Documents/tonk/fund-vis/cronlog.txt
 
