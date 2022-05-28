@@ -8,6 +8,10 @@ def cmd_input(args):
     command = args[0]
     if command == "cron":
         scraper.get_entry()
+    elif command == "check":
+        print(scraper.entries())
+    elif command == "render":
+        scraper.render()
     else:
         print("Imposter Alert")
     # match command:

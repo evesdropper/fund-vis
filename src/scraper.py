@@ -54,10 +54,6 @@ def get_entry():
     utils.save_entry(funds_arr, SAVEFILE)
     return fund[0].text
 
-def entries():
-    funds_arr = utils.load_entry(SAVEFILE)
-    return funds_arr
-
 # xlims
 def get_xlim():
     today = datetime.datetime.utcnow().date()
@@ -88,6 +84,11 @@ def visualize():
     plt.ylabel("Fund (in millions)")
     plt.legend(loc=2)
     return fig
+
+# utility batch functions for *testing purposes*
+def entries():
+    funds_arr = utils.load_entry(SAVEFILE)
+    return funds_arr
 
 def render():
     get_entry()
