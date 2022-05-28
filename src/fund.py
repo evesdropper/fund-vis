@@ -12,8 +12,8 @@ def cmd_input(args):
         print(scraper.entries()[-10:])
     elif command == "last":
         print(scraper.entries()[-1].time)
-    elif command == "render":
-        scraper.render()
+    elif command == "plot":
+        scraper.showplot()
     else:
         print("Imposter Alert")
     # match command:

@@ -87,7 +87,7 @@ def visualize():
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
-    plt.plot(mdates.datestr2num(x, y), marker=".", linestyle='-', color='b')
+    plt.plot(mdates.datestr2num(x), y, marker=".", linestyle='-', color='b')
     ax.scatter(mdates.datestr2num(x), y)
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
@@ -99,9 +99,9 @@ def visualize():
     # checkpoint lines
     for i in range(len(CHECKPOINTS)):
         if CHECKPOINTS[i] < max(y):
-            plt.axhline(CHECKPOINTS[i], color='green', a=0.65, linestyle='--', label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', label=REWARDS[i])
         elif CHECKPOINTS[i] < y_upper:
-            plt.axhline(CHECKPOINTS[i], color='red', a=0.5, linestyle='--', label=REWARDS[i])
+            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
     plt.legend(loc=2)
     return fig
@@ -118,6 +118,10 @@ def last_entry():
 
 def last_entry_time():
     return entries()[-1].time
+
+def showplot():
+    plot = visualize()
+    plot.show()
 
 def render():
     get_entry()
