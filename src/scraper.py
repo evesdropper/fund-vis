@@ -46,13 +46,17 @@ def reset():
 
 # fund 
 def get_entry():
-    page = requests.get(URL)
-    soup = BeautifulSoup(page.content, "html.parser")
-    fund = soup.find_all("span", class_="ms-3")
+    try: 
+        page = requests.get(URL)
+        soup = BeautifulSoup(page.content, "html.parser")
+        fund = soup.find_all("span", class_="ms-3")
+        fund_text = fund[0].text
+    except:
+        fund_text = last_entry()
     funds_arr = utils.load_entry(SAVEFILE)
-    funds_arr = np.append(funds_arr, FundEntry(fund[0].text))
+    funds_arr = np.append(funds_arr, FundEntry(fund_text))
     utils.save_entry(funds_arr, SAVEFILE)
-    return fund[0].text
+    return fund_text
 
 # xlims
 def get_xlim():
@@ -89,6 +93,9 @@ def visualize():
 def entries():
     funds_arr = utils.load_entry(SAVEFILE)
     return funds_arr
+
+def last_entry():
+    return entries()[-1].value
 
 def last_entry_time():
     return entries()[-1].time
