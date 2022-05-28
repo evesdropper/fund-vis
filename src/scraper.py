@@ -19,9 +19,11 @@ CWD = os.getcwd()
 SAVE_DIR = os.path.join(CWD, "saved")
 SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
 
+# fund specific
 URL = "https://tankionline.com/pages/tanki-birthday-2022/" # when new fund website
 CHECKPOINTS = [3] + list(range(6, 16))
 REWARDS = ["Prot Slot", "Prot Slot", "Skin Cont", "Skin Cont", "Prot Slot", "Hyperion", "Blaster", "Armadillo", "Pulsar", "Crisis", "Surprise"]
+END_DATE = pd.Timestamp("2022-06-20 2:00:00")
 
 """
 Base Setup
@@ -108,6 +110,13 @@ def next_checkpoint(reward=False):
     x_next = x_next.replace(tzinfo=datetime.timezone.utc)
     t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
     return f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
+
+def end_fund():
+    x, y = get_data()
+    x_time = mdates.datestr2num(x)
+    m, b = regression(x_time, y)
+    y_final = m * mdates.date2num(END_DATE) + b
+    return y_final, "Yes" if y_final > max(y) else "No"
 
 def tdelta_format(td):
     seconds = np.round(td.total_seconds())

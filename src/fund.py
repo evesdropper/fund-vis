@@ -16,6 +16,8 @@ def cmd_input(args):
         scraper.showplot()
     elif command == "nextpt":
         scraper.next_checkpoint()
+    elif command == "fin":
+        scraper.end_fund()
     else:
         print("Imposter Alert")
     # match command:
