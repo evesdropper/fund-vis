@@ -54,6 +54,10 @@ def get_entry():
     utils.save_entry(funds_arr, SAVEFILE)
     return fund[0].text
 
+def entries():
+    funds_arr = utils.load_entry(SAVEFILE)
+    return funds_arr
+
 # xlims
 def get_xlim():
     today = datetime.datetime.utcnow().date()
