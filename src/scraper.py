@@ -1,7 +1,7 @@
  # necessary imports - scraping and heroku being retarded
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-import utils as utils
+import src.utils as utils
 import requests
 from bs4 import BeautifulSoup
 
