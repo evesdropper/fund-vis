@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return render_template("index.html", current_fund = scraper.get_entry(), last_upd=datetime.datetime.now().strftime('%m-%d %H:%M'))
+    return render_template("index.html", current_fund = scraper.get_entry(), last_upd=datetime.datetime.now().strftime("%m-%d %H:%M"))
 
 @app.route('/plot.png')
 def plot_png():

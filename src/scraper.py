@@ -18,6 +18,8 @@ SAVE_DIR = os.path.join(CWD, "saved")
 SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
 
 URL = "https://tankionline.com/pages/tanki-birthday-2022/" # when new fund website
+CHECKPOINTS = [3] + list(range(6, 16))
+REWARDS = ["Prot Slot", "Prot Slot", "Skin Cont", "Skin Cont", "Prot Slot", "Hyperion", "Blaster", "Armadillo", "Pulsar", "Crisis", "Surprise"]
 
 # fund entries
 class FundEntry():
@@ -72,5 +74,8 @@ def visualize():
     plt.xticks(rotation=60)
     plt.xlabel("Time")
     ax.set_ylim(0, 1.2 * max(y))
+    # checkpoint lines
+    for i in range(len(CHECKPOINTS)):
+        plt.axhline(CHECKPOINTS[i], color='r', linestyle='--', label=REWARDS[i])
     plt.ylabel("Fund (in millions)")
     return fig
