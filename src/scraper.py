@@ -198,6 +198,8 @@ def one_day_delta(fund, start, epsilon=3/864): # 5 min epsilon
 
 # daily change
 def daily_delta(day=0):
+    if day < 0 or day > int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE)):
+        return 0
     funds_arr = utils.load_entry(SAVEFILE)
     dstart = mdates.date2num(START_DATE) + day
     start_filtered, end_filtered = [fund for fund in funds_arr if one_day_delta(fund, dstart - 1)] or [FundEntry(0)], [fund for fund in funds_arr if one_day_delta(fund, dstart)] or [FundEntry(0)]
@@ -206,13 +208,19 @@ def daily_delta(day=0):
     end_idx = nearest_index(end_times, dstart + 1)
     start_val, end_val = start_filtered[start_idx].value, end_filtered[end_idx].value
     if end_val != 0:
-        return f"<tr> <td>{day+1}</td> <td>{int(end_val) - int(start_val)}</td> </tr>"
+        return int(end_val) - int(start_val) # f"<tr> <td>{day+1}</td> <td>{int(end_val) - int(start_val)}</td> </tr>"
     else:
-        return ""
+        return 0
 
 def delta_tbl():
     out = "<table class='info-tbl'> <tr> <th>Day</th> <th>TK Increase</th> </tr>"
-    for day in range(0, int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE)) + 1):
-        out += f"\n{daily_delta(day)}"
+    out += f"<tr> <td>{1}</td> <td>{daily_delta(0)}</td> </tr>"
+    for day in range(1, int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE)) + 1):
+        cur, prev = daily_delta(day), daily_delta(day - 1)
+        percent = ((cur - prev) / prev) * 100 if prev != 0 else 0
+        sign = "\u2191" if percent > 0 else "\u2193"
+        if cur != 0:
+            out += f"<tr> <td>{day+1}</td> <td>{cur} ({sign} {np.round(abs(percent), 3)}%)</td> </tr>"
     out += "</table>"
+    print(out)
     return out
