@@ -4,21 +4,37 @@
     <meta charset="UTF-8">
     <meta name="description" content="Web app to scrape and track the progress of the Tanki Fund!">
     <title>Tanki Fund Tracker</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']]
+          }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
 </head>
 <body>
-    <h1 style="text-align: center;">Tanki Fund Tracker</h1>
-    <h2 style="text-align: center;">2022 - Tanki's 13th Birthday</h2>
-    <div style="margin:auto; background-color:red; width: 75%; padding:0.5em;"><h3 style="text-align: center;">
-        Service will be temporarily down/have inconsistent updates as I move to async.
-    </h3></div>
-    <div id="stats" style="display: flex; flex-flow: row wrap; justify-content: center; align-items: flex-start;">
+    <h1 class="center">Tanki Fund Tracker</h1>
+    <h2 class="center">2022 - Tanki's 13th Birthday</h2>
+    <div class="news" style="background-color: skyblue;"><h3 style="text-align: center;">
+        Service should be working properly now.</h3>
+    </div>
+    <div class="news">Updates:
+        <ul>
+            <li>Added Linear Regression and Analytics</li>
+            <li>Added backup for site outages and status bar.</li>
+        </ul>
+    </div>
+    <div id="stats" class="flexbox">
     <div>
         <img style="display: block; margin-left: auto; margin-right:auto;" src="/plot.png" alt="fund">
     </div>
     <div>
-    <h3 style="text-align: center;">Analytics</h3>
-    <table style="margin-left: auto; margin-right: auto;">
+    <h3 class="center">Analytics</h3>
+    <table class="info-tbl">
         <tr>
             <th>Current Funds</th>
             <th>Change</th>
@@ -44,8 +60,8 @@
             <td>{{end_miles[1]}}</td>
         </tr>
     </table>
-    <h3 style="text-align: center;">Site Status</h3>
-    <table style="margin-left: auto; margin-right: auto;">
+    <h3 class="center">Site Status</h3>
+    <table class="info-tbl">
         <tr>
             <th>Status</th>
             <th>Last Updated</th>

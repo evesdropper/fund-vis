@@ -2,12 +2,31 @@
     text-align: center;
 }
 
+.news {
+    margin:auto;
+    width: 75%;
+    padding:0.5em;
+}
+
+.flexbox {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
 img {
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
 
-footer {
-    background-color: grey;
+.info-tbl {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+p {
+    word-break: break-all;
+    white-space: normal;
 }
