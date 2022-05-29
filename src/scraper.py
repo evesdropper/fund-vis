@@ -25,6 +25,7 @@ CHECKPOINTS = [3] + list(range(6, 16))
 REWARDS = ["Prot Slot", "Prot Slot", "Skin Cont", "Skin Cont", "Prot Slot", "Hyperion", "Blaster", "Armadillo", "Pulsar", "Crisis", "Surprise"]
 START_DATE = pd.Timestamp("2022-05-27 2:00:00")
 END_DATE = pd.Timestamp("2022-06-20 2:00:00")
+DAYSPAN = int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE))
 
 """
 Base Setup
@@ -65,6 +66,40 @@ def reset():
     initialize_arr()
 
 """
+Neater Utility Methods
+"""
+def dnum(date):
+    return mdates.date2num(date)
+
+def dsnum(dstr):
+    return mdates.datestr2num(dstr)
+
+def numd(num):
+    return mdates.num2date(num)
+
+def sn_num(num):
+    return np.format_float_scientific(num, precision=3)
+
+def entries():
+    funds_arr = utils.load_entry(SAVEFILE)
+    return funds_arr
+
+def last_entry():
+    return entries()[-1].value
+
+def last_entry_time():
+    return entries()[-1].time
+
+def showplot():
+    visualize()
+    plt.show()
+
+def render():
+    get_entry()
+    out = visualize()
+    return out
+
+"""
 Major Workflow
 """
 def scrape(checkstatus=False):
@@ -93,20 +128,33 @@ def get_entry():
 """
 Visualization
 """
+# quick utility/helper methods
 # get data
 def get_data():
     funds_arr = utils.load_entry(SAVEFILE)
     x, y = [fund.time for fund in funds_arr], [(int(fund.value) / 1000000) for fund in funds_arr]
     return x, y
 
-def x_time(x):
-    return mdates.datestr2num(x)
-
 # xlims
 def get_xlim():
     today = datetime.datetime.utcnow().date()
     end_x = (today + datetime.timedelta(days=1))
     return pd.Timestamp(end_x)
+
+# get checkpoint lines
+def get_checklines(y):
+    y_upper = 1.2 * max(y)
+    for i in range(len(CHECKPOINTS)):
+        if CHECKPOINTS[i] < max(y):
+            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', alpha=0.35, label=f"Achieved: {REWARDS[i]}")
+        elif CHECKPOINTS[i] < y_upper:
+            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.35, label=f"Upcoming: {REWARDS[i]}")
+
+def get_labels(m, b, log=''):
+    x_exp = "log(x)" if log == "x" else "x"
+    if m > 100:
+        return f"y={(sn_num(m))}{x_exp}+{sn_num(m * dnum(START_DATE) + b)}"
+    return f"y={np.round(m, 3)}{x_exp}+{np.round(m * dnum(START_DATE) + b, 3)}"
 
 def regression(x, y, log=''):
     # logarithmic regression
@@ -115,45 +163,14 @@ def regression(x, y, log=''):
     if 'y' in log:
         y = np.log(y) # log(y) = mx + b; y = exp(mx + b)
     r = np.corrcoef(x, y)[0, 1]
-    # print(r,r**2)
     m = r * (np.std(y) / np.std(x))
     b = np.mean(y) - m * np.mean(x)
-    # print(m, b, x[0], x[0]+ 24, y[0], y[-1])
-    # print(m * x[0] + b, m * x[-1] + b, m * np.log(np.exp(x[0]) + 24) + b)
     return m, b
-
-def next_checkpoint(log=''):
-    x, y = get_data()
-    x_time = mdates.datestr2num(x)
-    m, b = regression(x_time, y, log)
-    c_next = [c for c in CHECKPOINTS if c > max(y)][0]
-    idx = CHECKPOINTS.index(c_next)
-    eqn = (c_next - b) / m
-    x_next = mdates.num2date(np.exp(eqn)) if log == 'x' else mdates.num2date(eqn)
-    x_next = x_next.replace(tzinfo=datetime.timezone.utc)
-    t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
-    return REWARDS[idx], f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
-
-def end_fund(log=""):
-    x, y = get_data()
-    x_time = mdates.datestr2num(x)
-    m, b = regression(x_time, y, log=log)
-    end = np.log(mdates.date2num(END_DATE)) if log =="x" else mdates.date2num(END_DATE)
-    y_final = m * end + b
-    # print(mdates.date2num(START_DATE), mdates.date2num(END_DATE))
-    return f"{np.round(y_final, 3)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
-
-def tdelta_format(td):
-    seconds = np.round(td.total_seconds())
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    return f"{int(hours)}h {int(minutes)}m"
-
 
 # scuffed :sob:
 def visualize():
     x, y = get_data()
-    x_time = mdates.datestr2num(x)
+    x_time = dsnum(x)
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
@@ -163,46 +180,17 @@ def visualize():
     ax.set_xlim(pd.Timestamp('2022-05-27 2:00:00'), get_xlim())
     plt.xticks(rotation=60)
     plt.xlabel("Time")
-    y_upper = 1.2 * max(y)
-    ax.set_ylim(0, y_upper)
-    # checkpoint lines
-    for i in range(len(CHECKPOINTS)):
-        if CHECKPOINTS[i] < max(y):
-            plt.axhline(CHECKPOINTS[i], color='green', linestyle='--', alpha=0.35, label=f"Achieved: {REWARDS[i]}")
-        elif CHECKPOINTS[i] < y_upper:
-            plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.35, label=f"Upcoming: {REWARDS[i]}")
+    ax.set_ylim(0, 1.2 * max(y))
     plt.ylabel("Fund (in millions)")
+    get_checklines(y)
     lin_m, lin_b = regression(x_time, y)
     log_m, log_b = regression(x_time, y, log='x')
-    xrange = [mdates.datestr2num('2022-05-27 2:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S'))]
+    xrange = [dsnum('2022-05-27 2:00:00'), dsnum(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S'))]
     lin_xrange = np.linspace(xrange[0], 2 * xrange[1])
-    # log_yrange = np.linspace(0, 15)
-    plt.plot(lin_xrange, lin_m*lin_xrange+lin_b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\ny={np.round(lin_m, 3)}x+{np.round(lin_m * mdates.date2num(START_DATE) + lin_b, 3)}")
-    plt.plot(lin_xrange, log_m*(np.log(lin_xrange)) + log_b, color='orange', linestyle="--", alpha=0.4, label=f"LogReg Prediction\ny={np.format_float_scientific(log_m, precision=3)}log(x)+{np.format_float_scientific(log_m * mdates.date2num(START_DATE) + log_b, precision=3)}")
+    plt.plot(lin_xrange, lin_m*lin_xrange+lin_b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\n{get_labels(lin_m, lin_b)}")
+    plt.plot(lin_xrange, log_m*(np.log(lin_xrange)) + log_b, color='orange', linestyle="--", alpha=0.4, label=f"LogReg Prediction\n{get_labels(log_m, log_b, log='x')}")
     plt.legend(loc=2, fontsize=8)
     return fig
-
-"""
-Utility Functions
-"""
-def entries():
-    funds_arr = utils.load_entry(SAVEFILE)
-    return funds_arr
-
-def last_entry():
-    return entries()[-1].value
-
-def last_entry_time():
-    return entries()[-1].time
-
-def showplot():
-    visualize()
-    plt.show()
-
-def render():
-    get_entry()
-    out = visualize()
-    return out
 
 """
 Change in Fund Values over time
@@ -237,19 +225,33 @@ def daily_delta(day=0):
     end_idx = nearest_index(end_times, dstart + 1)
     start_val, end_val = start_filtered[start_idx].value, end_filtered[end_idx].value
     if end_val != 0:
-        return int(end_val) - int(start_val) # f"<tr> <td>{day+1}</td> <td>{int(end_val) - int(start_val)}</td> </tr>"
+        return int(end_val) - int(start_val)
     else:
         return 0
 
-def delta_tbl():
-    out = "<table class='info-tbl'> <tr> <th>Day</th> <th>TK Increase</th> </tr>"
-    out += f"<tr> <td>{1}</td> <td>{daily_delta(0)}</td> </tr>"
-    for day in range(1, int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE)) + 1):
-        cur, prev = daily_delta(day), daily_delta(day - 1)
-        percent = ((cur - prev) / prev) * 100 if prev != 0 else 0
-        sign = "\u2191" if percent > 0 else "\u2193"
-        if cur != 0:
-            out += f"<tr> <td>{day+1}</td> <td>{cur} ({sign} {np.round(abs(percent), 3)}%)</td> </tr>"
-    out += "</table>"
-    # print(out)
-    return out
+def next_checkpoint(log=''):
+    x, y = get_data()
+    x_time = dsnum(x)
+    m, b = regression(x_time, y, log)
+    c_next = [c for c in CHECKPOINTS if c > max(y)][0]
+    idx = CHECKPOINTS.index(c_next)
+    eqn = (c_next - b) / m
+    x_next = mdates.num2date(np.exp(eqn)) if log == 'x' else mdates.num2date(eqn)
+    x_next = x_next.replace(tzinfo=datetime.timezone.utc)
+    t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
+    return REWARDS[idx], f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
+
+def end_fund(log=""):
+    x, y = get_data()
+    x_time = dsnum(x)
+    m, b = regression(x_time, y, log=log)
+    end = np.log(mdates.date2num(END_DATE)) if log =="x" else mdates.date2num(END_DATE)
+    y_final = m * end + b
+    # print(mdates.date2num(START_DATE), mdates.date2num(END_DATE))
+    return f"{np.round(y_final, 3)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
+
+def tdelta_format(td):
+    seconds = np.round(td.total_seconds())
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{int(hours)}h {int(minutes)}m"
