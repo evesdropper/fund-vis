@@ -178,7 +178,7 @@ def visualize():
     lin_xrange = np.linspace(xrange[0], 2 * xrange[1])
     # log_yrange = np.linspace(0, 15)
     plt.plot(lin_xrange, lin_m*lin_xrange+lin_b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\ny={np.round(lin_m, 3)}x+{np.round(lin_m * mdates.date2num(START_DATE) + lin_b, 3)}")
-    plt.plot(lin_xrange, log_m*(np.log(lin_xrange)) + log_b, color='green', linestyle="--", alpha=0.35, label=f"LogReg Prediction\ny={np.format_float_scientific(log_m, precision=3)}log(x)+{np.format_float_scientific(log_m * mdates.date2num(START_DATE) + log_b, precision=3)}")
+    plt.plot(lin_xrange, log_m*(np.log(lin_xrange)) + log_b, color='orange', linestyle="--", alpha=0.4, label=f"LogReg Prediction\ny={np.format_float_scientific(log_m, precision=3)}log(x)+{np.format_float_scientific(log_m * mdates.date2num(START_DATE) + log_b, precision=3)}")
     plt.legend(loc=2, fontsize=8)
     return fig
 
