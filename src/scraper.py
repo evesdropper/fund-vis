@@ -115,11 +115,11 @@ def regression(x, y, log=''):
     if 'y' in log:
         y = np.log(y)
     r = np.corrcoef(x, y)[0, 1]
-    print(r,r**2)
+    # print(r,r**2)
     m = r * (np.std(y) / np.std(x))
     b = np.mean(y) - m * np.mean(x)
-    print(m, b, x[0], x[0]+ 24, y[0], y[-1])
-    print(m * x[0] + b, m * x[-1] + b, m * (x[0] + 24) + b)
+    # print(m, b, x[0], x[0]+ 24, y[0], y[-1])
+    # print(m * x[0] + b, m * x[-1] + b, m * np.log(np.exp(x[0]) + 24) + b)
     return m, b
 
 def next_checkpoint():
@@ -173,10 +173,10 @@ def visualize():
     lin_m, lin_b = regression(x_time, y)
     log_m, log_b = regression(x_time, y, log='x')
     xrange = [mdates.datestr2num('2022-05-27 2:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S'))]
-    lin_xrange = np.linspace(xrange[0], xrange[1])
-    log_yrange = np.linspace(0, 15)
+    lin_xrange = np.linspace(xrange[0], 2 * xrange[1])
+    # log_yrange = np.linspace(0, 15)
     plt.plot(lin_xrange, lin_m*lin_xrange+lin_b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\ny={np.round(lin_m, 3)}x+{np.round(log_m * mdates.date2num(START_DATE) + log_b, 3)}")
-    plt.plot((log_yrange - log_b)/log_m, log_yrange, color='green', linestyle="--", alpha=0.35, label=f"LogReg Prediction")
+    plt.plot(lin_xrange, log_m*(np.log(lin_xrange)) + log_b, color='green', linestyle="--", alpha=0.35, label=f"LogReg Prediction\ny={np.format_float_scientific(log_m, precision=3)}log(x)+{np.format_float_scientific(log_m * mdates.date2num(START_DATE) + log_b, precision=3)}")
     plt.legend(loc=2, fontsize=8)
     return fig
 
