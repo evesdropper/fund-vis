@@ -32,8 +32,8 @@ Base Setup
 # fund entries
 class FundEntry():
     
-    def __init__(self, value):
-        self.time = datetime.datetime.utcnow().strftime('%m-%d %H:%M')
+    def __init__(self, value, time=None):
+        self.time = datetime.datetime.utcnow().strftime('%m-%d %H:%M') if not time else time.strftime('%m-%d %H:%M')
         self.value = value
     
     def __repr__(self):
@@ -46,6 +46,18 @@ class FundEntry():
 def initialize_arr():
     funds_arr = np.array([])
     utils.save_entry(funds_arr, SAVEFILE)
+
+def delerror():
+    funds_arr = utils.load_entry(SAVEFILE)
+    funds_arr = funds_arr[:-1]
+    utils.save_entry(funds_arr, SAVEFILE)
+
+def delallerrors():
+    funds_arr = utils.load_entry(SAVEFILE)
+    funds_arr = funds_arr.tolist()
+    funds_arr = [fund for fund in funds_arr if fund.value != 0]
+    funds_arr = np.array(funds_arr)
+    utils.save_entry(funds_arr, SAVEFILE) 
 
 # reset fund data
 def reset():
@@ -87,16 +99,27 @@ def get_data():
     x, y = [fund.time for fund in funds_arr], [(int(fund.value) / 1000000) for fund in funds_arr]
     return x, y
 
+def x_time(x):
+    return mdates.datestr2num(x)
+
 # xlims
 def get_xlim():
     today = datetime.datetime.utcnow().date()
     end_x = (today + datetime.timedelta(days=1))
     return pd.Timestamp(end_x)
 
-def regression(x, y):
+def regression(x, y, log=''):
+    # logarithmic regression
+    if 'x' in log:
+        x = np.log(x)
+    if 'y' in log:
+        y = np.log(y)
     r = np.corrcoef(x, y)[0, 1]
+    print(r,r**2)
     m = r * (np.std(y) / np.std(x))
-    b = np.mean(y) - m * np.mean(x)    
+    b = np.mean(y) - m * np.mean(x)
+    print(m, b, x[0], x[0]+ 24, y[0], y[-1])
+    print(m * x[0] + b, m * x[-1] + b, m * (x[0] + 24) + b)
     return m, b
 
 def next_checkpoint():
@@ -147,9 +170,13 @@ def visualize():
         elif CHECKPOINTS[i] < y_upper:
             plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.35, label=f"Upcoming: {REWARDS[i]}")
     plt.ylabel("Fund (in millions)")
-    m, b = regression(x_time, y)
-    xrange = np.linspace(mdates.datestr2num('2022-05-27 2:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')))
-    plt.plot(xrange, m*xrange+b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\ny={np.round(m, 3)}x+{np.round(m * mdates.date2num(START_DATE) + b, 3)}")
+    lin_m, lin_b = regression(x_time, y)
+    log_m, log_b = regression(x_time, y, log='x')
+    xrange = [mdates.datestr2num('2022-05-27 2:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S'))]
+    lin_xrange = np.linspace(xrange[0], xrange[1])
+    log_yrange = np.linspace(0, 15)
+    plt.plot(lin_xrange, lin_m*lin_xrange+lin_b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\ny={np.round(lin_m, 3)}x+{np.round(log_m * mdates.date2num(START_DATE) + log_b, 3)}")
+    plt.plot((log_yrange - log_b)/log_m, log_yrange, color='green', linestyle="--", alpha=0.35, label=f"LogReg Prediction")
     plt.legend(loc=2, fontsize=8)
     return fig
 

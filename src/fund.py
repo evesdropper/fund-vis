@@ -12,8 +12,14 @@ def cmd_input(args):
         print(scraper.entries()[-10:])
     elif command == "last":
         print(scraper.entries()[-1].time)
+    elif command == "zero":
+        scraper.addzero()
+    elif command == "del":
+        scraper.delallerrors()
     elif command == "plot":
         scraper.showplot()
+    elif command == "reg":
+        scraper.regression(x=scraper.x_time(scraper.get_data()[0]), y=scraper.get_data()[1], log="x")
     elif command == "nextpt":
         scraper.next_checkpoint()
     elif command == "fin":
