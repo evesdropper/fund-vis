@@ -23,6 +23,7 @@ SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
 URL = "https://tankionline.com/pages/tanki-birthday-2022/" # when new fund website
 CHECKPOINTS = [3] + list(range(6, 16))
 REWARDS = ["Prot Slot", "Prot Slot", "Skin Cont", "Skin Cont", "Prot Slot", "Hyperion", "Blaster", "Armadillo", "Pulsar", "Crisis", "Surprise"]
+START_DATE = pd.Timestamp("2022-05-27 2:00:00")
 END_DATE = pd.Timestamp("2022-06-20 2:00:00")
 
 """
@@ -33,7 +34,7 @@ class FundEntry():
     
     def __init__(self, value):
         self.time = datetime.datetime.utcnow().strftime('%m-%d %H:%M')
-        self.value = value    
+        self.value = value
     
     def __repr__(self):
         return f"{self.time}: {self.value}"
@@ -114,6 +115,7 @@ def end_fund():
     x_time = mdates.datestr2num(x)
     m, b = regression(x_time, y)
     y_final = m * mdates.date2num(END_DATE) + b
+    print(mdates.date2num(START_DATE), mdates.date2num(END_DATE))
     return f"{np.round(y_final, 3)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
 
 def tdelta_format(td):
@@ -133,7 +135,7 @@ def visualize():
     plt.plot(x_time, y, marker=".", linestyle='-', markersize=10)
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
-    ax.set_xlim(pd.Timestamp('2022-05-27 12:00:00'), get_xlim())
+    ax.set_xlim(pd.Timestamp('2022-05-27 2:00:00'), get_xlim())
     plt.xticks(rotation=60)
     plt.xlabel("Time")
     y_upper = 1.2 * max(y)
@@ -146,8 +148,8 @@ def visualize():
             plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.35, label=f"Upcoming: {REWARDS[i]}")
     plt.ylabel("Fund (in millions)")
     m, b = regression(x_time, y)
-    xrange = np.linspace(mdates.datestr2num('2022-05-27 12:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')))
-    plt.plot(xrange, m*xrange+b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction\ny={np.round(m, 3)}x+{np.round(b, 3)}")
+    xrange = np.linspace(mdates.datestr2num('2022-05-27 2:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')))
+    plt.plot(xrange, m*xrange+b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction\ny={np.round(m, 3)}x+{np.round(m * mdates.date2num(START_DATE) + b, 3)}")
     plt.legend(loc=2, fontsize=8)
     return fig
 
