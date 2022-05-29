@@ -149,7 +149,7 @@ def visualize():
     plt.ylabel("Fund (in millions)")
     m, b = regression(x_time, y)
     xrange = np.linspace(mdates.datestr2num('2022-05-27 2:00:00'), mdates.datestr2num(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S')))
-    plt.plot(xrange, m*xrange+b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction\ny={np.round(m, 3)}x+{np.round(m * mdates.date2num(START_DATE) + b, 3)}")
+    plt.plot(xrange, m*xrange+b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\ny={np.round(m, 3)}x+{np.round(m * mdates.date2num(START_DATE) + b, 3)}")
     plt.legend(loc=2, fontsize=8)
     return fig
 
