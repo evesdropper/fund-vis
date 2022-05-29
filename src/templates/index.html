@@ -23,10 +23,10 @@
     <div class="news" style="background-color: skyblue;"><h3 style="text-align: center;">
         Service should be working properly now.</h3>
     </div>
-    <div class="news"><h4>Updates:</h4>
+    <div class="news"><h4>Updates and Changelog (Updated 5/29):</h4>
         <ul>
-            <li>Added Linear Regression and Analytics.</li>
-            <li>Added backup for site outages and status bar.</li>
+            <li>Added Log Regression and Analytics.</li>
+            <li>Coming Soon: UI updates.</li>
         </ul>
     </div>
 </header>
@@ -36,7 +36,9 @@
     </div>
     <div>
     <h3 class="center">Analytics</h3>
-    <p>Current status, Daily Changes, Predictions.</p>
+    <br>
+    <strong>Current and Daily Changes</strong>
+    <hr>
     <table class="info-tbl">
         <tr>
             <th>Current Funds</th>
@@ -53,6 +55,9 @@
       <option value="lin">Linear</option>
       <option value="poly" disabled>Polynomial</option>
     </select> -->
+    <br>
+    <strong>Linear Regression Model</strong>
+    <hr>
     <table>
         <tr>
             <th>Next Checkpoint</th>
@@ -71,7 +76,27 @@
             <td>{{end_miles[1]}}</td>
         </tr>
     </table>
-     
+    <br>
+    <strong>Log Transform Regression Model</strong>
+    <hr>
+    <table>
+        <tr>
+            <th>Next Checkpoint</th>
+            <th>Est. Time to Next Check</th>
+        </tr>
+        <tr>
+            <td>{{l_next_check[0]}}</td>
+            <td>{{l_next_check[1]}}</td>
+        </tr>
+        <tr>
+            <th>Est. End Fund (LogReg)</th>
+            <th>All Milestones?</th>
+        </tr>
+        <tr>
+            <td>{{l_end_miles[0]}}</td>
+            <td>{{l_end_miles[1]}}</td>
+        </tr>
+    </table>
     <h3 class="center">Site Status</h3>
     <table class="info-tbl">
         <tr>
@@ -88,6 +113,7 @@
     <br>
 </body>
 <div class="news"><h3 class="center">Interpreting Results</h3>
+<h4>Linear Regresssion</h4>
 Currently, we have a linear regression model ($y = mx + b$) to predict future results. Here's how to interpret the data:
 <ul>
     <li>$m$: slope, or predicted increase over time. Measured in millions of Tankoins per day.</li>
@@ -95,6 +121,10 @@ Currently, we have a linear regression model ($y = mx + b$) to predict future re
     <li>$y$: predicted value at time $x$.</li>
 </ul>
 Given that the slope is gradually decreasing while the intercept is increasing, it means it may be best to use another model. Once more data is gathered, different prediction methods and polynomial regression models can be used to predict future results.
+<h4>Log Transformed Linear Regresssion</h4>
+Similar to linear regression, but since the points are trending towards being nonlinear, we can use a logarithmic transformation to make the data more linear. This is done by taking the logarithm of the data, specifically the $x$ variable.
+
+We now end up with something like $y = m\log(x) + b$ and a graph that resembles a logarithmic curve. Interpreting the equation is similar to linear regression, but the predicted value takes the log of $x$ instead of $x$ in the linear model. 
 </div>
 <br>
 <footer style="text-align: center; padding:0.5em; margin-top:0.5em">

@@ -13,8 +13,8 @@ app = Flask(__name__, static_url_path='/static')
 def index():
     return render_template("index.html", current_fund = scraper.get_entry(),
     change=scraper.fund_delta(),
-    next_check = scraper.next_checkpoint(),
-    end_miles=scraper.end_fund(),
+    next_check = scraper.next_checkpoint(), end_miles=scraper.end_fund(),
+    l_next_check = scraper.next_checkpoint(log="x"), l_end_miles=scraper.end_fund(log="x"),
     dtbl=scraper.delta_tbl(),
     last_upd=scraper.last_entry_time(),status=scraper.scrape(checkstatus=True))
 

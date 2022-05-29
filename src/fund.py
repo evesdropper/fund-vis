@@ -21,9 +21,9 @@ def cmd_input(args):
     elif command == "reg":
         scraper.regression(x=scraper.x_time(scraper.get_data()[0]), y=scraper.get_data()[1], log="x")
     elif command == "nextpt":
-        scraper.next_checkpoint()
+        print(scraper.next_checkpoint(log="x"))
     elif command == "fin":
-        scraper.end_fund()
+        print(scraper.end_fund(log="x"))
     elif command == "ddelta":
         scraper.delta_tbl()
     else:

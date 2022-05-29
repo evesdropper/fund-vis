@@ -111,9 +111,9 @@ def get_xlim():
 def regression(x, y, log=''):
     # logarithmic regression
     if 'x' in log:
-        x = np.log(x)
+        x = np.log(x) # y = mlog(x) + b
     if 'y' in log:
-        y = np.log(y)
+        y = np.log(y) # log(y) = mx + b; y = exp(mx + b)
     r = np.corrcoef(x, y)[0, 1]
     # print(r,r**2)
     m = r * (np.std(y) / np.std(x))
@@ -122,23 +122,25 @@ def regression(x, y, log=''):
     # print(m * x[0] + b, m * x[-1] + b, m * np.log(np.exp(x[0]) + 24) + b)
     return m, b
 
-def next_checkpoint():
+def next_checkpoint(log=''):
     x, y = get_data()
     x_time = mdates.datestr2num(x)
-    m, b = regression(x_time, y)
+    m, b = regression(x_time, y, log)
     c_next = [c for c in CHECKPOINTS if c > max(y)][0]
     idx = CHECKPOINTS.index(c_next)
-    x_next = mdates.num2date((c_next - b) / m)
+    eqn = (c_next - b) / m
+    x_next = mdates.num2date(np.exp(eqn)) if log == 'x' else mdates.num2date(eqn)
     x_next = x_next.replace(tzinfo=datetime.timezone.utc)
     t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
     return REWARDS[idx], f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
 
-def end_fund():
+def end_fund(log=""):
     x, y = get_data()
     x_time = mdates.datestr2num(x)
-    m, b = regression(x_time, y)
-    y_final = m * mdates.date2num(END_DATE) + b
-    print(mdates.date2num(START_DATE), mdates.date2num(END_DATE))
+    m, b = regression(x_time, y, log=log)
+    end = np.log(mdates.date2num(END_DATE)) if log =="x" else mdates.date2num(END_DATE)
+    y_final = m * end + b
+    # print(mdates.date2num(START_DATE), mdates.date2num(END_DATE))
     return f"{np.round(y_final, 3)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
 
 def tdelta_format(td):
@@ -249,5 +251,5 @@ def delta_tbl():
         if cur != 0:
             out += f"<tr> <td>{day+1}</td> <td>{cur} ({sign} {np.round(abs(percent), 3)}%)</td> </tr>"
     out += "</table>"
-    print(out)
+    # print(out)
     return out
