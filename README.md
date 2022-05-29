@@ -4,12 +4,15 @@ Small Flask app to visualize the Tanki Fund and provide analytics on the fund's 
 
 ## Features
 - CLI for dev testing.
-- Basic Analytics: Currently shows the current funds and changes as well as reached and new checkpoints.
-- Site status page: fetches backups if site is not working.
+- Analytics: Currently shows the following:
+    - Current values in the fund; reached and new checkpoints.
+    - Basic Linear regression and prediction model.
+    - Daily TK increase and percentage change from the day before.
+- Site status page: fetches backups from local saved file if site is not responding. `cron.sh` creates local backups every 15 minutes; `update.sh` automatically re-deploys to GitHub every hour.
 
-## Coming Soon
-- UI update: Will attempt to add React to make the site neater.
-- More Analytics: Regressions, Predictions, time to next milestone.
+## In Progress/Coming Soon
+- UI update: Neaten everything out and choose a nice font. Right now, everything looks fine, but with new features come new challenges to make the site more compact.
+- Even More Analytics: Better predictions, more regression models, select menu to view each method.
 - Code Cleanup: clearing out unused functions/making the codebase easier to read and understand.
 
 ## CLI Usage

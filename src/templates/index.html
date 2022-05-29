@@ -46,6 +46,14 @@
             <td>{{current_fund}}</td>
             <td>{{change}}</td>
         </tr>
+    </table>
+    {{dtbl | safe}}
+    <!-- <label for="model"><strong>Prediction Model:</strong></label>
+    <select id="model">
+      <option value="lin">Linear</option>
+      <option value="poly" disabled>Polynomial</option>
+    </select> -->
+    <table>
         <tr>
             <th>Next Checkpoint</th>
             <th>Est. Time to Next Check</th>
@@ -63,7 +71,7 @@
             <td>{{end_miles[1]}}</td>
         </tr>
     </table>
-    {{dtbl | safe}} 
+     
     <h3 class="center">Site Status</h3>
     <table class="info-tbl">
         <tr>
