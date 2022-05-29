@@ -181,3 +181,13 @@ def fund_delta():
         return int(funds_arr[-1].value) - int(funds_arr[-2].value)
     else:
         return 0
+
+# daily delta stuff
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+def daily_delta(date=START_DATE):
+    funds_arr = utils.load_entry(SAVEFILE)
+    arr_filtered = [fund for fund in funds_arr]
