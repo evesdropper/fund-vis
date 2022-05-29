@@ -211,16 +211,16 @@ def nearest_index(array, value):
 
 # check if the fund entry is within 1 day of the start date
 def one_day_delta(fund, start, epsilon=3/864): # 5 min epsilon
-    return (mdates.datestr2num(fund.time) - start) <= (1 + epsilon) and (mdates.datestr2num(fund.time) - start) >= 1 - (3.5 * epsilon)
+    return (dsnum(fund.time) - start) <= (1 + epsilon) and (dsnum(fund.time) - start) >= 1 - (3.5 * epsilon)
 
 # daily change
 def daily_delta(day=0):
-    if day < 0 or day > int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE)):
+    if day < 0 or day > DAYSPAN:
         return 0
     funds_arr = utils.load_entry(SAVEFILE)
-    dstart = mdates.date2num(START_DATE) + day
+    dstart = dnum(START_DATE) + day
     start_filtered, end_filtered = [fund for fund in funds_arr if one_day_delta(fund, dstart - 1)] or [FundEntry(0)], [fund for fund in funds_arr if one_day_delta(fund, dstart)] or [FundEntry(0)]
-    start_times, end_times = [mdates.datestr2num(fund.time) for fund in start_filtered], [mdates.datestr2num(fund.time) for fund in end_filtered]
+    start_times, end_times = [dsnum(fund.time) for fund in start_filtered], [dsnum(fund.time) for fund in end_filtered]
     start_idx = nearest_index(start_times, dstart)
     end_idx = nearest_index(end_times, dstart + 1)
     start_val, end_val = start_filtered[start_idx].value, end_filtered[end_idx].value
@@ -236,7 +236,7 @@ def next_checkpoint(log=''):
     c_next = [c for c in CHECKPOINTS if c > max(y)][0]
     idx = CHECKPOINTS.index(c_next)
     eqn = (c_next - b) / m
-    x_next = mdates.num2date(np.exp(eqn)) if log == 'x' else mdates.num2date(eqn)
+    x_next = numd(np.exp(eqn)) if log == 'x' else numd(eqn)
     x_next = x_next.replace(tzinfo=datetime.timezone.utc)
     t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
     return REWARDS[idx], f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
@@ -245,7 +245,7 @@ def end_fund(log=""):
     x, y = get_data()
     x_time = dsnum(x)
     m, b = regression(x_time, y, log=log)
-    end = np.log(mdates.date2num(END_DATE)) if log =="x" else mdates.date2num(END_DATE)
+    end = np.log(dnum(END_DATE)) if log =="x" else dnum(END_DATE)
     y_final = m * end + b
     # print(mdates.date2num(START_DATE), mdates.date2num(END_DATE))
     return f"{np.round(y_final, 3)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
