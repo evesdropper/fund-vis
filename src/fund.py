@@ -18,6 +18,8 @@ def cmd_input(args):
         scraper.next_checkpoint()
     elif command == "fin":
         scraper.end_fund()
+    elif command == "ddelta":
+        scraper.delta_tbl()
     else:
         print("Imposter Alert")
     # match command:

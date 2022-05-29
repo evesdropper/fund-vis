@@ -175,6 +175,10 @@ def render():
     out = visualize()
     return out
 
+"""
+Change in Fund Values over time
+"""
+
 def fund_delta():
     funds_arr = utils.load_entry(SAVEFILE)
     if len(funds_arr) > 1:
@@ -183,11 +187,32 @@ def fund_delta():
         return 0
 
 # daily delta stuff
-def find_nearest(array, value):
+def nearest_index(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
-    return array[idx]
+    return idx
 
-def daily_delta(date=START_DATE):
+# check if the fund entry is within 1 day of the start date
+def one_day_delta(fund, start, epsilon=3/864): # 5 min epsilon
+    return (mdates.datestr2num(fund.time) - start) <= (1 + epsilon) and (mdates.datestr2num(fund.time) - start) >= 1 - (3.5 * epsilon)
+
+# daily change
+def daily_delta(day=0):
     funds_arr = utils.load_entry(SAVEFILE)
-    arr_filtered = [fund for fund in funds_arr]
+    dstart = mdates.date2num(START_DATE) + day
+    start_filtered, end_filtered = [fund for fund in funds_arr if one_day_delta(fund, dstart - 1)] or [FundEntry(0)], [fund for fund in funds_arr if one_day_delta(fund, dstart)] or [FundEntry(0)]
+    start_times, end_times = [mdates.datestr2num(fund.time) for fund in start_filtered], [mdates.datestr2num(fund.time) for fund in end_filtered]
+    start_idx = nearest_index(start_times, dstart)
+    end_idx = nearest_index(end_times, dstart + 1)
+    start_val, end_val = start_filtered[start_idx].value, end_filtered[end_idx].value
+    if end_val != 0:
+        return f"<tr> <td>{day+1}</td> <td>{int(end_val) - int(start_val)}</td> </tr>"
+    else:
+        return ""
+
+def delta_tbl():
+    out = "<table class='info-tbl'> <tr> <th>Day</th> <th>TK Increase</th> </tr>"
+    for day in range(0, int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE)) + 1):
+        out += f"\n{daily_delta(day)}"
+    out += "</table>"
+    return out

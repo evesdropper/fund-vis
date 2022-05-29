@@ -15,6 +15,7 @@ def index():
     change=scraper.fund_delta(),
     next_check = scraper.next_checkpoint(),
     end_miles=scraper.end_fund(),
+    dtbl=scraper.delta_tbl(),
     last_upd=scraper.last_entry_time(),status=scraper.scrape(checkstatus=True))
 
 @app.route('/plot.png')
