@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 # data analysis
 import datetime
 import numpy as np
-from scipy import optimize
+# from scipy import optimize
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
