@@ -15,6 +15,8 @@
     <script type="text/javascript" id="MathJax-script" async
   src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/select.js"></script>
 </head>
 <body>
 <header>
@@ -50,19 +52,25 @@
         </tr>
     </table>
     {{dtbl | safe}}
-    <!-- <label for="model"><strong>Prediction Model:</strong></label>
-    <select id="model">
-      <option value="lin">Linear</option>
-      <option value="poly" disabled>Polynomial</option>
-    </select> -->
     <br>
+    <label for="model"><strong>Prediction Model:</strong></label>
+    <select id="modelselector">
+      <option value="lin">Linear</option>
+      <option value="log">Log Transform</option>
+      <option value="poly" disabled>Polynomial (Coming Soon)</option>
+    </select>
+    <br><br>
+    <div id="lin" class="models" style="display:block">
     <strong>Linear Regression Model</strong>
     <hr>
     {{lin_tbl | safe}}
-    <br>
+    </div>
+    <div id="log" class="models" style="display:none">
     <strong>Log Transform Regression Model</strong>
     <hr>
     {{log_tbl | safe}}
+    </div>
+    <br>
     <h3 class="centext">Site Status</h3>
     <table class="info-tbl">
         <tr>
