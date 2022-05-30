@@ -9,6 +9,8 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from flask import Flask, render_template, Response
 
 app = Flask(__name__, static_url_path='/static')
+linreg_txt = "./assets/linreg.txt"
+logreg_txt = "./assets/logreg.txt"
 
 @app.route("/")
 def index():
@@ -16,7 +18,8 @@ def index():
     change=scraper.fund_delta(),
     lin_tbl=stat_tbl(), log_tbl=stat_tbl(log="x"),
     dtbl=delta_tbl(),
-    last_upd=scraper.last_entry_time(),status=scraper.scrape(checkstatus=True))
+    last_upd=scraper.last_entry_time(),status=scraper.scrape(checkstatus=True),
+    linreg_txt = open(linreg_txt, "r").read(), logreg_txt=open(logreg_txt, "r").read())
 
 """
 plt figure to .png

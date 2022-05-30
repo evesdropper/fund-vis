@@ -1,0 +1,7 @@
+Currently, we have a linear regression model ($y = mx + b$) to predict future results. Here's how to interpret the data:
+<ul>
+    <li>$m$: slope, or predicted increase over time. Measured in millions of Tankoins per day.</li>
+    <li>$b$: intercept/offset, or number of Tankoins predicted to be in the fund at the start of the fund.</li>
+    <li>$y$: predicted value at time $x$.</li>
+</ul>
+Given that the slope is gradually decreasing while the intercept is increasing, it means it may be best to use another model. Once more data is gathered, different prediction methods and polynomial regression models can be used to predict future results.

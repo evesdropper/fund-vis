@@ -23,7 +23,7 @@
     <h1 class="centext">Tanki Fund Tracker</h1>
     <h2 class="centext">2022 - Tanki's 13th Birthday</h2>
     <div class="news" style="background-color: goldenrod;"><h3 class="centext">
-        Model estimates are still not entirely accurate; predictors will give better results in a few days.</h3>
+        Remade regressions with a more representative sample including observations from early data. Due to this, Model estimates are not entirely accurate; predictors will give better results in a few days.</h3>
     </div>
     <div class="news"><h4>Updates and Changelog (Updated 5/30):</h4>
         <ul>
@@ -98,19 +98,9 @@
 </body>
 <div class="news"><h3 class="centext">Interpreting Results</h3>
 <h4>Linear Regresssion</h4>
-Currently, we have a linear regression model ($y = mx + b$) to predict future results. Here's how to interpret the data:
-<ul>
-    <li>$m$: slope, or predicted increase over time. Measured in millions of Tankoins per day.</li>
-    <li>$b$: intercept/offset, or number of Tankoins predicted to be in the fund at the start of the fund.</li>
-    <li>$y$: predicted value at time $x$.</li>
-</ul>
-Given that the slope is gradually decreasing while the intercept is increasing, it means it may be best to use another model. Once more data is gathered, different prediction methods and polynomial regression models can be used to predict future results.
+{{linreg_txt | safe}}
 <h4>Log Transformed Linear Regression</h4>
-Similar to linear regression, but since the points are trending towards being nonlinear, we can use a logarithmic transformation to make the data more linear. This is done by taking the logarithm of the data, specifically the $x$ variable.
-
-We now end up with something like $y = m\log(x) + b$ and a graph that resembles a logarithmic curve. Interpreting the equation is similar to linear regression, but the predicted value takes the log of $x$ instead of $x$ in the linear model.
-<h4>Note</h4>
-Regression final predictions may not be accurate as early data was not captured. 
+{{logreg_txt | safe}}
 </div>
 <br>
 <footer class="centext">
