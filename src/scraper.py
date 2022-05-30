@@ -19,6 +19,7 @@ CWD = os.getcwd()
 SAVE_DIR = os.path.join(CWD, "saved")
 OBSFILE = os.path.join(SAVE_DIR, "observed.txt")
 SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
+SAVE_NEW = os.path.join(SAVE_DIR, "fundv2.txt")
 
 # fund specific
 URL = "https://tankionline.com/pages/tanki-birthday-2022/" # when new fund website
@@ -27,6 +28,7 @@ REWARDS = ["Prot Slot", "Prot Slot", "Skin Cont", "Skin Cont", "Prot Slot", "Hyp
 START_DATE = pd.Timestamp("2022-05-27 2:00:00")
 END_DATE = pd.Timestamp("2022-06-20 2:00:00")
 DAYSPAN = int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE))
+
 
 """
 Base Setup
@@ -77,9 +79,7 @@ def check_archive():
     return archive_arr
 
 def to_csv():
-    funds_arr = utils.load_entry(SAVEFILE)
-    archive_arr = utils.load_entry(OBSFILE)
-    full_arr = np.concatenate((archive_arr, funds_arr))
+    full_arr = utils.load_entry(SAVE_NEW)
     full_arr = full_arr.tolist()
     times, funds = [numd(dsnum(fund.time))-(START_DATE.to_pydatetime()).replace(tzinfo=datetime.timezone.utc) for fund in full_arr], [int(fund.value) for fund in full_arr]
     df = pd.DataFrame(np.transpose([times, funds]), columns=["Elapsed Time", "Fund"])
@@ -106,7 +106,7 @@ def sn_num(num):
     return np.format_float_scientific(num, precision=3)
 
 def entries():
-    funds_arr = utils.load_entry(SAVEFILE)
+    funds_arr = utils.load_entry(SAVE_NEW)
     return funds_arr
 
 def last_entry():
@@ -144,21 +144,39 @@ def scrape(checkstatus=False):
 # fund 
 def get_entry():
     fund_text = scrape()
-    funds_arr = utils.load_entry(SAVEFILE)
+    funds_arr = utils.load_entry(SAVE_NEW)
+    # prevent duplicates
+    if fund_text in [fund.value for fund in funds_arr]:
+        return fund_text
     funds_arr = np.append(funds_arr, FundEntry(fund_text))
-    utils.save_entry(funds_arr, SAVEFILE)
+    utils.save_entry(funds_arr, SAVE_NEW)
     return fund_text
 
+def no_duplicates():
+    funds_arr = utils.load_entry(SAVEFILE)
+    archive_arr = utils.load_entry(OBSFILE)
+    full_arr = np.concatenate((archive_arr, funds_arr))
+    values = list(set([fund.value for fund in full_arr]))
+    # print(np.sort(list(values)))
+    no_dup = []
+    for entry in full_arr:
+        if entry.value in values:
+            no_dup.append(entry)
+            values.remove(entry.value)
+    utils.save_entry(np.array(no_dup), SAVE_NEW)
+    check = utils.load_entry(SAVE_NEW)
+    print(check)
 
 """
 Visualization
 """
 # quick utility/helper methods
 # get data
-def get_data(treat=False):
-    funds_arr = utils.load_entry(SAVEFILE)
-    archive_arr = utils.load_entry(OBSFILE)
-    full_arr = np.concatenate((archive_arr, treat_data(funds_arr))) if treat == True else np.concatenate((archive_arr, funds_arr))
+def get_data():
+    # funds_arr = utils.load_entry(SAVEFILE)
+    # archive_arr = utils.load_entry(OBSFILE)
+    # full_arr = np.concatenate((archive_arr, treat_data(funds_arr))) if treat == True else np.concatenate((archive_arr, funds_arr))
+    full_arr = utils.load_entry(SAVE_NEW)
     x, y = [fund.time for fund in full_arr], [(int(fund.value) / 1000000) for fund in full_arr]
     return x, y
 
@@ -212,15 +230,13 @@ def regression(x, y, log=''):
 
 # scuffed :sob:
 def visualize():
-    x, y = get_data(treat=True)
+    x, y = get_data()
     x, y = np.sort(x), np.sort(y)
     x_time = dsnum(x)
-    graph_x, graph_y = get_data()
-    graph_x_time = dsnum(graph_x)
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
-    plt.plot(graph_x_time, graph_y, marker=".", linestyle='-', markersize=10)
+    plt.plot(x_time, y, marker=".", linestyle='-', markersize=10)
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
     ax.set_xlim(pd.Timestamp('2022-05-27 2:00:00'), get_xlim())
@@ -244,7 +260,7 @@ Change in Fund Values over time
 """
 
 def fund_delta():
-    funds_arr = utils.load_entry(SAVEFILE)
+    funds_arr = utils.load_entry(SAVE_NEW)
     if len(funds_arr) > 1:
         return int(funds_arr[-1].value) - int(funds_arr[-2].value)
     else:
@@ -256,17 +272,18 @@ def nearest_index(array, value):
     idx = (np.abs(array - value)).argmin()
     return idx
 
-# check if the fund entry is within 1 day of the start date
-def one_day_delta(fund, start, epsilon=3/864): # 5 min epsilon
-    return (dsnum(fund.time) - start) <= (1 + epsilon) and (dsnum(fund.time) - start) >= 1 - (3.5 * epsilon)
+# check if the fund entry is within 1 day pm 30 min of the start date
+def one_day_delta(fund, start, epsilon=36/864): # 5 min epsilon
+    return (dsnum(fund.time) - start) <= 1 + (2 * epsilon) and (dsnum(fund.time) - start) >= 1 - (2 * epsilon)
 
 # daily change
 def daily_delta(day=0):
     if day < 0 or day > DAYSPAN:
         return 0
-    funds_arr = utils.load_entry(SAVEFILE)
+    funds_arr = utils.load_entry(SAVE_NEW)
     dstart = dnum(START_DATE) + day
     start_filtered, end_filtered = [fund for fund in funds_arr if one_day_delta(fund, dstart - 1)] or [FundEntry(0)], [fund for fund in funds_arr if one_day_delta(fund, dstart)] or [FundEntry(0)]
+    print(end_filtered)
     start_times, end_times = [dsnum(fund.time) for fund in start_filtered], [dsnum(fund.time) for fund in end_filtered]
     start_idx = nearest_index(start_times, dstart)
     end_idx = nearest_index(end_times, dstart + 1)
@@ -285,7 +302,7 @@ def get_index_from_check(y):
     return idx
 
 def time_to_check(log='', index=None):
-    x, y = get_data(treat=True)
+    x, y = get_data()
     x_time = dsnum(x)
     m, b = regression(x_time, y, log)
     end = END_DATE.to_pydatetime().replace(tzinfo=datetime.timezone.utc)
@@ -300,7 +317,7 @@ def time_to_check(log='', index=None):
     return REWARDS[idx], "Cannot Reach"
 
 def end_fund(log=""):
-    x, y = get_data(treat=True)
+    x, y = get_data()
     x_time = dsnum(x)
     m, b = regression(x_time, y, log=log)
     end = np.log(dnum(END_DATE)) if log =="x" else dnum(END_DATE)

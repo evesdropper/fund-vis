@@ -9,7 +9,7 @@ def cmd_input(args):
     if command == "cron":
         scraper.get_entry()
     elif command == "check":
-        print(scraper.entries()[:20])
+        print(scraper.entries()[-10:])
     elif command == "last":
         print(scraper.entries()[-1].time)
     elif command == "del":
@@ -23,7 +23,7 @@ def cmd_input(args):
     elif command == "fin":
         print(scraper.end_fund(log="x"))
     elif command == "ddelta":
-        scraper.delta_tbl()
+        scraper.daily_delta()
     # elif command == "addarch":
     #     scraper.add_entry()
     elif command == "acheck":
@@ -32,6 +32,8 @@ def cmd_input(args):
         scraper.treat_data(scraper.entries())
     elif command == "csv":
         scraper.to_csv()
+    elif command == "dup":
+        scraper.no_duplicates()
     else:
         print("Imposter Alert")
     # match command:
