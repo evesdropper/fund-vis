@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 # data analysis
 import datetime
 import numpy as np
+from scipy import optimize
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -216,16 +217,17 @@ def get_labels(m, b, log=''):
         return f"y={(sn_num(m))}{x_exp}+{sn_num(m * dnum(START_DATE) + b)}"
     return f"y={np.round(m, 3)}{x_exp}+{np.round(m * dnum(START_DATE) + b, 3)}"
 
-def regression(x, y, log=''):
+def linreg(x, y, log=''):
     # logarithmic regression
     if 'x' in log:
         x = np.log(x) # y = mlog(x) + b
     if 'y' in log:
         y = np.log(y) # log(y) = mx + b; y = exp(mx + b)
     r = np.corrcoef(x, y)[0, 1]
+    print(r, r**2)
     m = r * (np.std(y) / np.std(x))
     b = np.mean(y) - m * np.mean(x)
-    print(m, b, x[0], y[0], m * x[0] + b, m * np.log(np.exp(x[0])+24) + b)
+    # print(m, b, x[0], y[0], m * x[0] + b, m * np.log(np.exp(x[0])+24) + b)
     return m, b
 
 # scuffed :sob:
@@ -245,13 +247,12 @@ def visualize():
     ax.set_ylim(0, 1.2 * max(y))
     plt.ylabel("Fund (in millions)")
     get_checklines(y)
-    lin_m, lin_b = regression(x_time, y)
-    log_m, log_b = regression(x_time, y, log='x')
+    lin_m, lin_b = linreg(x_time, y)
+    log_m, log_b = linreg(x_time, y, log='x')
     xrange = [dsnum('2022-05-27 2:00:00'), dsnum(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S'))]
     lin_xrange = np.linspace(xrange[0], 2 * xrange[1])
     plt.plot(lin_xrange, lin_m*lin_xrange+lin_b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\n{get_labels(lin_m, lin_b)}")
     plt.plot(lin_xrange, log_m*(np.log(lin_xrange)) + log_b, color='orange', linestyle="--", alpha=0.4, label=f"LogReg Prediction\n{get_labels(log_m, log_b, log='x')}")
-    print(log_m*(np.log(xrange[0]))+log_b, log_m*(np.log(xrange[1]))+log_b)
     plt.legend(loc=2, fontsize=8)
     return fig
 
@@ -304,7 +305,7 @@ def get_index_from_check(y):
 def time_to_check(log='', index=None):
     x, y = get_data()
     x_time = dsnum(x)
-    m, b = regression(x_time, y, log)
+    m, b = linreg(x_time, y, log)
     end = END_DATE.to_pydatetime().replace(tzinfo=datetime.timezone.utc)
     idx = get_index_from_check(max(y)) if not index else index
     c_next = CHECKPOINTS[idx]
@@ -319,7 +320,7 @@ def time_to_check(log='', index=None):
 def end_fund(log=""):
     x, y = get_data()
     x_time = dsnum(x)
-    m, b = regression(x_time, y, log=log)
+    m, b = linreg(x_time, y, log=log)
     end = np.log(dnum(END_DATE)) if log =="x" else dnum(END_DATE)
     y_final = np.round(m * end + b, 3)
     if y_final < CHECKPOINTS[-1]:
