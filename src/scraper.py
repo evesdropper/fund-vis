@@ -230,6 +230,19 @@ def linreg(x, y, log=''):
     # print(m, b, x[0], y[0], m * x[0] + b, m * np.log(np.exp(x[0])+24) + b)
     return m, b
 
+def polyreg(x, y):
+    plt.figure(figsize = (12, 8))
+    for i in range(2, 8):
+    # get the polynomial coefficients
+        y_est = np.polyfit(x, y, i)
+        plt.subplot(2,3,i-1)
+        plt.plot(x, y, 'o')
+    # evaluate the values for a polynomial
+        plt.plot(x, np.polyval(y_est, x))
+        plt.title(f'Polynomial order {i}')
+    plt.tight_layout()
+    plt.show()
+
 # scuffed :sob:
 def visualize():
     x, y = get_data()

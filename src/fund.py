@@ -18,8 +18,8 @@ def cmd_input(args):
         scraper.showplot()
     elif command == "linreg":
         scraper.linreg(x=scraper.x_time(scraper.get_data()[0]), y=scraper.get_data()[1], log="x")
-    elif command == "lstq":
-        scraper.lstq(x=scraper.x_time(scraper.get_data()[0]), y=scraper.get_data()[1], log="")
+    elif command == "polyreg":
+        scraper.polyreg(x=scraper.x_time(scraper.get_data()[0]), y=scraper.get_data()[1])
     elif command == "nextpt":
         print(scraper.time_to_check(log="x"))
     elif command == "fin":
