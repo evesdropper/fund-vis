@@ -212,15 +212,15 @@ def regression(x, y, log=''):
 
 # scuffed :sob:
 def visualize():
-    x, y = get_data(treat=False)
-    # x, y = np.sort(x), np.sort(y)
+    x, y = get_data(treat=True)
+    x, y = np.sort(x), np.sort(y)
     x_time = dsnum(x)
-    # graph_x, graph_y = get_data()
-    # graph_x_time = dsnum(graph_x)
+    graph_x, graph_y = get_data()
+    graph_x_time = dsnum(graph_x)
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
-    plt.plot(x_time, y, marker=".", linestyle='-', markersize=10)
+    plt.plot(graph_x_time, graph_y, marker=".", linestyle='-', markersize=10)
     plt.title("Tanki Fund over Time", fontsize=20)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d %H:%M'))
     ax.set_xlim(pd.Timestamp('2022-05-27 2:00:00'), get_xlim())
@@ -276,16 +276,21 @@ def daily_delta(day=0):
     else:
         return 0
 
+def get_index_from_check(y):
+    try:
+        c_next = [c for c in CHECKPOINTS if c > y][0]
+    except IndexError:
+        c_next = CHECKPOINTS[-1]
+    idx = CHECKPOINTS.index(c_next)
+    return idx
+
 def time_to_check(log='', index=None):
-    x, y = get_data()
+    x, y = get_data(treat=True)
     x_time = dsnum(x)
     m, b = regression(x_time, y, log)
     end = END_DATE.to_pydatetime().replace(tzinfo=datetime.timezone.utc)
-    try:
-        c_next = [c for c in CHECKPOINTS if c > max(y)][0] if not index else CHECKPOINTS[index]
-    except IndexError:
-        c_next = CHECKPOINTS[-1]
-    idx = CHECKPOINTS.index(c_next) if not index else index
+    idx = get_index_from_check(max(y)) if not index else index
+    c_next = CHECKPOINTS[idx]
     eqn = (c_next - b) / m
     x_next = numd(np.exp(eqn)) if log == 'x' else numd(eqn)
     x_next = x_next.replace(tzinfo=datetime.timezone.utc)
@@ -295,13 +300,17 @@ def time_to_check(log='', index=None):
     return REWARDS[idx], "Cannot Reach"
 
 def end_fund(log=""):
-    x, y = get_data(treat=False)
+    x, y = get_data(treat=True)
     x_time = dsnum(x)
     m, b = regression(x_time, y, log=log)
     end = np.log(dnum(END_DATE)) if log =="x" else dnum(END_DATE)
-    y_final = m * end + b
+    y_final = np.round(m * end + b, 3)
+    if y_final < CHECKPOINTS[-1]:
+        idx = get_index_from_check(y_final)
+        return f"{y_final}M Tankoins", f"No (Will miss {REWARDS[idx]})"
+    return f"{y_final}M Tankoins", 'Yes'
     # print(mdates.date2num(START_DATE), mdates.date2num(END_DATE))
-    return f"{np.round(y_final, 3)}M Tankoins", "Yes" if y_final > CHECKPOINTS[-1] else "No"
+    
 
 def tdelta_format(td):
     seconds = np.round(td.total_seconds())
