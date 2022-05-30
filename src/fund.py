@@ -9,23 +9,29 @@ def cmd_input(args):
     if command == "cron":
         scraper.get_entry()
     elif command == "check":
-        print(scraper.entries()[-10:])
+        print(scraper.entries()[:20])
     elif command == "last":
         print(scraper.entries()[-1].time)
-    elif command == "zero":
-        scraper.addzero()
     elif command == "del":
         scraper.delallerrors()
     elif command == "plot":
         scraper.showplot()
     elif command == "reg":
-        scraper.regression(x=scraper.x_time(scraper.get_data()[0]), y=scraper.get_data()[1], log="x")
+        scraper.regression(x=scraper.x_time(scraper.get_data(treat=True)[0]), y=scraper.get_data(treat=True)[1], log="x")
     elif command == "nextpt":
-        print(scraper.next_checkpoint(log="x"))
+        print(scraper.time_to_check(log="x"))
     elif command == "fin":
         print(scraper.end_fund(log="x"))
     elif command == "ddelta":
         scraper.delta_tbl()
+    # elif command == "addarch":
+    #     scraper.add_entry()
+    elif command == "acheck":
+        scraper.check_archive()
+    elif command == "afix":
+        scraper.treat_data(scraper.entries())
+    elif command == "csv":
+        scraper.to_csv()
     else:
         print("Imposter Alert")
     # match command:

@@ -33,10 +33,10 @@ Table Generation
 """
 # prediction stats table
 def stat_tbl(log=""):
-    next_check = scraper.next_checkpoint(log=log)
+    next_check = scraper.time_to_check(log=log)
     end_miles = scraper.end_fund(log=log)
     model = "Log" if log else "Lin"
-    out = f'''<table> <tr> <th>Next Checkpoint</th> <th>Est. Time to Next Check</th> </tr>
+    out = f'''<table> <tr> <th>Select Checkpoint</th> <th>Est. Time to Next Check</th> </tr>
     <tr> <td>{next_check[0]}</td> <td>{next_check[1]}</td> </tr>
     <tr> <th>Est. End Fund ({model}Reg)</th> <th>All Milestones?</th> </tr>
     <tr> <td>{end_miles[0]}</td> <td>{end_miles[1]}</td> </tr>

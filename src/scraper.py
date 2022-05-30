@@ -17,6 +17,7 @@ CWD = os.getcwd()
 # DOCS = os.environ["DOCS"]
 # PROJ_DIR = os.path.join(DOCS, "tonk/fund-vis/src")
 SAVE_DIR = os.path.join(CWD, "saved")
+OBSFILE = os.path.join(SAVE_DIR, "observed.txt")
 SAVEFILE = os.path.join(SAVE_DIR, "fund.txt")
 
 # fund specific
@@ -60,10 +61,34 @@ def delallerrors():
     funds_arr = np.array(funds_arr)
     utils.save_entry(funds_arr, SAVEFILE) 
 
+# archive stuff
+def add_archives():
+    archive_arr = np.array([])
+    utils.save_entry(archive_arr, OBSFILE)
+
+def add_entry():
+    archive_arr = utils.load_entry(OBSFILE)
+    # add 
+    utils.save_entry(archive_arr, OBSFILE)
+
+def check_archive():
+    archive_arr = utils.load_entry(OBSFILE)
+    print(archive_arr)
+    return archive_arr
+
+def to_csv():
+    funds_arr = utils.load_entry(SAVEFILE)
+    archive_arr = utils.load_entry(OBSFILE)
+    full_arr = np.concatenate((archive_arr, funds_arr))
+    full_arr = full_arr.tolist()
+    times, funds = [numd(dsnum(fund.time))-(START_DATE.to_pydatetime()).replace(tzinfo=datetime.timezone.utc) for fund in full_arr], [int(fund.value) for fund in full_arr]
+    df = pd.DataFrame(np.transpose([times, funds]), columns=["Elapsed Time", "Fund"])
+    df.to_csv(os.path.join(SAVE_DIR, "fund.csv"))
+
 # reset fund data
-def reset():
-    utils.clean(SAVEFILE)
-    initialize_arr()
+# def reset():
+#     utils.clean(SAVEFILE)
+#     initialize_arr()
 
 """
 Neater Utility Methods
@@ -130,10 +155,27 @@ Visualization
 """
 # quick utility/helper methods
 # get data
-def get_data():
+def get_data(treat=False):
     funds_arr = utils.load_entry(SAVEFILE)
-    x, y = [fund.time for fund in funds_arr], [(int(fund.value) / 1000000) for fund in funds_arr]
+    archive_arr = utils.load_entry(OBSFILE)
+    full_arr = np.concatenate((archive_arr, treat_data(funds_arr))) if treat == True else np.concatenate((archive_arr, funds_arr))
+    x, y = [fund.time for fund in full_arr], [(int(fund.value) / 1000000) for fund in full_arr]
     return x, y
+
+fund_outages = [25, 26, 47, 48, 51, -1]
+def treat_data(arr, indices=fund_outages):
+    now = datetime.datetime.utcnow()
+    num_samples = (now - START_DATE.to_pydatetime()).total_seconds() // (3*3600)
+    arr = arr.tolist()
+    out = []
+    for i in indices:
+        out.append(arr[i])
+    for i in indices:
+        arr.pop(i)
+    return np.concatenate((np.array(out), np.random.choice(np.array(arr), int(num_samples), replace=False)))
+
+def x_time(x):
+    return dsnum(x)
 
 # xlims
 def get_xlim():
@@ -165,12 +207,16 @@ def regression(x, y, log=''):
     r = np.corrcoef(x, y)[0, 1]
     m = r * (np.std(y) / np.std(x))
     b = np.mean(y) - m * np.mean(x)
+    print(m, b, x[0], y[0], m * x[0] + b, m * np.log(np.exp(x[0])+24) + b)
     return m, b
 
 # scuffed :sob:
 def visualize():
-    x, y = get_data()
+    x, y = get_data(treat=False)
+    # x, y = np.sort(x), np.sort(y)
     x_time = dsnum(x)
+    # graph_x, graph_y = get_data()
+    # graph_x_time = dsnum(graph_x)
     fig = plt.figure(figsize=(8, 6), dpi=100)
     ax = fig.add_subplot(111)
     plt.subplots_adjust(bottom=0.25)
@@ -189,6 +235,7 @@ def visualize():
     lin_xrange = np.linspace(xrange[0], 2 * xrange[1])
     plt.plot(lin_xrange, lin_m*lin_xrange+lin_b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\n{get_labels(lin_m, lin_b)}")
     plt.plot(lin_xrange, log_m*(np.log(lin_xrange)) + log_b, color='orange', linestyle="--", alpha=0.4, label=f"LogReg Prediction\n{get_labels(log_m, log_b, log='x')}")
+    print(log_m*(np.log(xrange[0]))+log_b, log_m*(np.log(xrange[1]))+log_b)
     plt.legend(loc=2, fontsize=8)
     return fig
 
@@ -229,20 +276,26 @@ def daily_delta(day=0):
     else:
         return 0
 
-def next_checkpoint(log=''):
+def time_to_check(log='', index=None):
     x, y = get_data()
     x_time = dsnum(x)
     m, b = regression(x_time, y, log)
-    c_next = [c for c in CHECKPOINTS if c > max(y)][0]
-    idx = CHECKPOINTS.index(c_next)
+    end = END_DATE.to_pydatetime().replace(tzinfo=datetime.timezone.utc)
+    try:
+        c_next = [c for c in CHECKPOINTS if c > max(y)][0] if not index else CHECKPOINTS[index]
+    except IndexError:
+        c_next = CHECKPOINTS[-1]
+    idx = CHECKPOINTS.index(c_next) if not index else index
     eqn = (c_next - b) / m
     x_next = numd(np.exp(eqn)) if log == 'x' else numd(eqn)
     x_next = x_next.replace(tzinfo=datetime.timezone.utc)
-    t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
-    return REWARDS[idx], f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
+    if (end - x_next).total_seconds() > 0:
+        t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
+        return REWARDS[idx], f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
+    return REWARDS[idx], "Cannot Reach"
 
 def end_fund(log=""):
-    x, y = get_data()
+    x, y = get_data(treat=False)
     x_time = dsnum(x)
     m, b = regression(x_time, y, log=log)
     end = np.log(dnum(END_DATE)) if log =="x" else dnum(END_DATE)
@@ -252,6 +305,9 @@ def end_fund(log=""):
 
 def tdelta_format(td):
     seconds = np.round(td.total_seconds())
-    hours, remainder = divmod(seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
+    days, rem1 = divmod(seconds, 86400)
+    hours, rem2 = divmod(rem1, 3600)
+    minutes, seconds = divmod(rem2, 60)
+    if days > 0:
+        return f"{int(days)}d {int(hours)}h {int(minutes)}m"
     return f"{int(hours)}h {int(minutes)}m"
