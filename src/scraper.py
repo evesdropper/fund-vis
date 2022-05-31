@@ -29,7 +29,7 @@ REWARDS = ["Prot Slot", "Prot Slot", "Skin Cont", "Skin Cont", "Prot Slot", "Hyp
 START_DATE = pd.Timestamp("2022-05-27 2:00:00")
 END_DATE = pd.Timestamp("2022-06-20 2:00:00")
 DAYSPAN = int(mdates.date2num(END_DATE)) - int(mdates.date2num(START_DATE))
-
+SHIFT = int(mdates.date2num(START_DATE))
 
 """
 Base Setup
@@ -212,7 +212,7 @@ def get_checklines(y):
             plt.axhline(CHECKPOINTS[i], color='red', linestyle='--', alpha=0.35, label=f"Upcoming: {REWARDS[i]}")
 
 def get_labels(m, b, log=''):
-    x_exp = "log(x)" if log == "x" else "x"
+    x_exp = f"log(x-{SHIFT})" if log == "x" else "x"
     if m > 100:
         return f"y={(sn_num(m))}{x_exp}+{sn_num(m * dnum(START_DATE) + b)}"
     return f"y={np.round(m, 3)}{x_exp}+{np.round(m * dnum(START_DATE) + b, 3)}"
@@ -220,14 +220,18 @@ def get_labels(m, b, log=''):
 def linreg(x, y, log=''):
     # logarithmic regression
     if 'x' in log:
+        reg = np.ones(len(x)) * (SHIFT) # zeroing the data 
+        x = np.subtract(x, reg)
         x = np.log(x) # y = mlog(x) + b
+        # print(x)
     if 'y' in log:
         y = np.log(y) # log(y) = mx + b; y = exp(mx + b)
     r = np.corrcoef(x, y)[0, 1]
-    print(r, r**2)
     m = r * (np.std(y) / np.std(x))
     b = np.mean(y) - m * np.mean(x)
-    # print(m, b, x[0], y[0], m * x[0] + b, m * np.log(np.exp(x[0])+24) + b)
+    if log == "x":
+        # print(m, b, x[0], y[0], m * x[0] + b, m * np.log(np.exp(x[0])+24) + b)
+        return m, b
     return m, b
 
 def polyreg(x, y):
@@ -263,9 +267,11 @@ def visualize():
     lin_m, lin_b = linreg(x_time, y)
     log_m, log_b = linreg(x_time, y, log='x')
     xrange = [dsnum('2022-05-27 2:00:00'), dsnum(get_xlim().to_pydatetime().strftime('%Y-%m-%d %H:%M:%S'))]
-    lin_xrange = np.linspace(xrange[0], 2 * xrange[1])
+    lin_xrange = np.linspace(xrange[0], xrange[1] + 2)
     plt.plot(lin_xrange, lin_m*lin_xrange+lin_b, color='black', linestyle="--", alpha=0.35, label=f"LinReg Prediction:\n{get_labels(lin_m, lin_b)}")
-    plt.plot(lin_xrange, log_m*(np.log(lin_xrange)) + log_b, color='orange', linestyle="--", alpha=0.4, label=f"LogReg Prediction\n{get_labels(log_m, log_b, log='x')}")
+    plt.plot(lin_xrange, log_m*(np.log(lin_xrange-SHIFT)) + log_b, color='orange', linestyle="--", alpha=0.65, label=f"LogReg Prediction\n{get_labels(log_m, log_b, log='x')}")
+    # print(log_m, log_b, lin_xrange[0]-SHIFT, lin_xrange[-1]-SHIFT)
+    # print(log_m*(np.log(lin_xrange-SHIFT)) + log_b)
     plt.legend(loc=2, fontsize=8)
     return fig
 
@@ -323,8 +329,9 @@ def time_to_check(log='', index=None):
     idx = get_index_from_check(max(y)) if not index else index
     c_next = CHECKPOINTS[idx]
     eqn = (c_next - b) / m
-    x_next = numd(np.exp(eqn)) if log == 'x' else numd(eqn)
+    x_next = numd(np.exp(eqn)+SHIFT) if log == 'x' else numd(eqn)
     x_next = x_next.replace(tzinfo=datetime.timezone.utc)
+    print(end - x_next)
     if (end - x_next).total_seconds() > 0:
         t_next = tdelta_format(x_next - datetime.datetime.now(datetime.timezone.utc))
         return REWARDS[idx], f"{t_next} ({x_next.strftime('%m-%d %H:%M')})"
@@ -334,7 +341,7 @@ def end_fund(log=""):
     x, y = get_data()
     x_time = dsnum(x)
     m, b = linreg(x_time, y, log=log)
-    end = np.log(dnum(END_DATE)) if log =="x" else dnum(END_DATE)
+    end = np.log(dnum(END_DATE)-SHIFT) if log =="x" else dnum(END_DATE)
     y_final = np.round(m * end + b, 3)
     if y_final < CHECKPOINTS[-1]:
         idx = get_index_from_check(y_final)
