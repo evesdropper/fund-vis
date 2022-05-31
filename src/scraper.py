@@ -287,7 +287,7 @@ def nearest_index(array, value):
     return idx
 
 # check if the fund entry is within 1 day pm 30 min of the start date
-def one_day_delta(fund, start, epsilon=36/864): # 5 min epsilon
+def one_day_delta(fund, start, epsilon=15/864): # 5 min epsilon
     return (dsnum(fund.time) - start) <= 1 + (2 * epsilon) and (dsnum(fund.time) - start) >= 1 - (2 * epsilon)
 
 # daily change
